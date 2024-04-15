@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback Voltage Divider Resistor Calculator</title>
+    <script>
+        'use strict';
+        function addlog(str) {
+            let e = document.getElementsByClassName("log")[0];
+            let date = new Date();
+            str = date.toLocaleString() + "&nbsp;&nbsp;" + str;
+            e.innerHTML = str + "<br>" + e.innerHTML;
+        }
+
+        function decode_value(str) {
+            let num = (str.match(/[\d|\.]*/));
+            if(num == "" || num == null) {
+                num = "0";
+            }
+            num = parseFloat(num);
+            let unit = str.match(/[a-zA-Z]*$/);
+            /*
+            console.debug("num: \"" + num + "\"");
+            console.debug("unit: \"" + unit + "\"");
+            */
+            switch (String(unit)) {
+                case null:
+                case "":
+                    return num;
+                    break;
+                case "k":
+                case "K":
+                    return num * 1000;
+                    break;
+                case "M":
+                    return num * 1000000;
+                    break;
+                case "G":
+                case "g":
+                    return num * 1000000000;
+                    break;
+                case "T":
+                case "t":
+                    return num * 1000000000000;
+                    break;
+                case "P":
+                    return num * 1000000000000000;
+                    break;
+                
+                case "m":
+                    return num / 1000;
+                    break;
+                case "u":
+                case "μ":
+                case "µ":
+                    return num / 1000000;
+                    break;
+                case "n":
+                    return num / 1000000000;
+                    break;
+                case "p":
+                    return num / 1000000000000;
+                    break;
+                case "f":
+                    return num / 1000000000000000;
+                    break;
+            }
+            return null;
+        }
+
+        function encode_value(num) {
+            let digit = Math.log10(num) / 3;
+            digit = Math.floor(digit);
+            let normalized_num = num / Math.pow(10, digit * 3);
+            normalized_num = String(normalized_num.toPrecision(10)).replace(/0*$/, "").replace(/\.$/, "");
+            switch (digit) {
+                case 0:
+                    return normalized_num + "";
+                    break;
+                case 1:
+                    return normalized_num + "k";
+                    break;
+                case 2:
+                    return normalized_num + "M";
+                    break;
+                case 3:
+                    return normalized_num + "G";
+                    break;
+                case 4:
+                    return normalized_num + "T";
+                    break;
+                case 5:
+                    return normalized_num + "P";
+                    break;
+                case -1:
+                    return normalized_num + "m";
+                    break;
+                case -2:
+                    return normalized_num + "u";
+                    break;
+                case -3:
+                    return normalized_num + "n";
+                    break;
+                case -4:
+                    return normalized_num + "p";
+                    break;
+                case -5:
+                    return normalized_num + "f";
+                    break;
+                default:
+                    return num;
+            }
+        }
+
+        function calc_r2form() {
+            const input_query = ".R2form .input "
+            const output_query = ".R2form .output "
+            let Vref_in = document.querySelector(input_query + "#Vref");
+            let R1_in = document.querySelector(input_query + "#R1");
+            let R2_in = document.querySelector(input_query + "#R2");
+            let Vout_in = document.querySelector(input_query + "#Vout");
+
+            let Vref_out = document.querySelector(output_query + "#Vref");
+            let R1_out = document.querySelector(output_query + "#R1");
+            let R2_out = document.querySelector(output_query + "#R2");
+            let Vout_out = document.querySelector(output_query + "#Vout");
+            let Ir1_out = document.querySelector(output_query + "#Ir1");
+
+            let Vref = decode_value(Vref_in.value);
+            let R1 = decode_value(R1_in.value);
+            let R2 = decode_value(R2_in.value);
+            let Vout = decode_value(Vout_in.value);
+            let Ir1 = 0;
+
+            if(Vref == null) {
+                Vref_in.classList.add("error");
+            } else {
+                Vref_in.classList.remove("error");
+            }
+            if(R1 == null) {
+                R1_in.classList.add("error");
+            } else {
+                R1_in.classList.remove("error");
+            }
+            if(R2 == null) {
+                R2_in.classList.add("error");
+            } else {
+                R2_in.classList.remove("error");
+            }
+            if(Vout == null) {
+                Vout_in.classList.add("error");
+            } else {
+                Vout_in.classList.remove("error");
+            }
+
+            R2 = R1 / ((Vout / Vref) - 1);
+            Ir1 = Vout / (R1 + R2);
+
+            Vref_out.value = encode_value(Vref);
+            R1_out.value = encode_value(R1);
+            R2_out.value = encode_value(R2);
+            Vout_out.value = encode_value(Vout);
+            Ir1_out.value = encode_value(Ir1);
+        }
+
+        function calc_r1form() {
+            const input_query = ".R1form .input "
+            const output_query = ".R1form .output "
+            let Vref_in = document.querySelector(input_query + "#Vref");
+            let R1_in = document.querySelector(input_query + "#R1");
+            let R2_in = document.querySelector(input_query + "#R2");
+            let Vout_in = document.querySelector(input_query + "#Vout");
+
+            let Vref_out = document.querySelector(output_query + "#Vref");
+            let R1_out = document.querySelector(output_query + "#R1");
+            let R2_out = document.querySelector(output_query + "#R2");
+            let Vout_out = document.querySelector(output_query + "#Vout");
+            let Ir1_out = document.querySelector(output_query + "#Ir1");
+
+            let Vref = decode_value(Vref_in.value);
+            let R1 = decode_value(R1_in.value);
+            let R2 = decode_value(R2_in.value);
+            let Vout = decode_value(Vout_in.value);
+            let Ir1 = 0;
+
+            if(Vref == null) {
+                Vref_in.classList.add("error");
+            } else {
+                Vref_in.classList.remove("error");
+            }
+            if(R1 == null) {
+                R1_in.classList.add("error");
+            } else {
+                R1_in.classList.remove("error");
+            }
+            if(R2 == null) {
+                R2_in.classList.add("error");
+            } else {
+                R2_in.classList.remove("error");
+            }
+            if(Vout == null) {
+                Vout_in.classList.add("error");
+            } else {
+                Vout_in.classList.remove("error");
+            }
+
+            R1 = R2 * ((Vout / Vref) - 1);
+            Ir1 = Vout / (R1 + R2);
+
+            Vref_out.value = encode_value(Vref);
+            R1_out.value = encode_value(R1);
+            R2_out.value = encode_value(R2);
+            Vout_out.value = encode_value(Vout);
+            Ir1_out.value = encode_value(Ir1);
+        }
+
+        function calc_voutform() {
+            const input_query = ".Voutform .input "
+            const output_query = ".Voutform .output "
+            let Vref_in = document.querySelector(input_query + "#Vref");
+            let R1_in = document.querySelector(input_query + "#R1");
+            let R2_in = document.querySelector(input_query + "#R2");
+            let Vout_in = document.querySelector(input_query + "#Vout");
+
+            let Vref_out = document.querySelector(output_query + "#Vref");
+            let R1_out = document.querySelector(output_query + "#R1");
+            let R2_out = document.querySelector(output_query + "#R2");
+            let Vout_out = document.querySelector(output_query + "#Vout");
+            let Ir1_out = document.querySelector(output_query + "#Ir1");
+
+            let Vref = decode_value(Vref_in.value);
+            let R1 = decode_value(R1_in.value);
+            let R2 = decode_value(R2_in.value);
+            let Vout = decode_value(Vout_in.value);
+            let Ir1 = 0;
+
+            if(Vref == null) {
+                Vref_in.classList.add("error");
+            } else {
+                Vref_in.classList.remove("error");
+            }
+            if(R1 == null) {
+                R1_in.classList.add("error");
+            } else {
+                R1_in.classList.remove("error");
+            }
+            if(R2 == null) {
+                R2_in.classList.add("error");
+            } else {
+                R2_in.classList.remove("error");
+            }
+            if(Vout == null) {
+                Vout_in.classList.add("error");
+            } else {
+                Vout_in.classList.remove("error");
+            }
+
+            Vout = Vref * (1 + (R1 / R2));
+            Ir1 = Vout / (R1 + R2);
+
+            Vref_out.value = encode_value(Vref);
+            R1_out.value = encode_value(R1);
+            R2_out.value = encode_value(R2);
+            Vout_out.value = encode_value(Vout);
+            Ir1_out.value = encode_value(Ir1);
+        }
+
+        function calc_vrefform() {
+            const input_query = ".Vrefform .input "
+            const output_query = ".Vrefform .output "
+            let Vref_in = document.querySelector(input_query + "#Vref");
+            let R1_in = document.querySelector(input_query + "#R1");
+            let R2_in = document.querySelector(input_query + "#R2");
+            let Vout_in = document.querySelector(input_query + "#Vout");
+
+            let Vref_out = document.querySelector(output_query + "#Vref");
+            let R1_out = document.querySelector(output_query + "#R1");
+            let R2_out = document.querySelector(output_query + "#R2");
+            let Vout_out = document.querySelector(output_query + "#Vout");
+            let Ir1_out = document.querySelector(output_query + "#Ir1");
+
+            let Vref = decode_value(Vref_in.value);
+            let R1 = decode_value(R1_in.value);
+            let R2 = decode_value(R2_in.value);
+            let Vout = decode_value(Vout_in.value);
+            let Ir1 = 0;
+
+            if(Vref == null) {
+                Vref_in.classList.add("error");
+            } else {
+                Vref_in.classList.remove("error");
+            }
+            if(R1 == null) {
+                R1_in.classList.add("error");
+            } else {
+                R1_in.classList.remove("error");
+            }
+            if(R2 == null) {
+                R2_in.classList.add("error");
+            } else {
+                R2_in.classList.remove("error");
+            }
+            if(Vout == null) {
+                Vout_in.classList.add("error");
+            } else {
+                Vout_in.classList.remove("error");
+            }
+
+            Vref = Vout / (1 + (R1 / R2));
+            Ir1 = Vout / (R1 + R2);
+
+            Vref_out.value = encode_value(Vref);
+            R1_out.value = encode_value(R1);
+            R2_out.value = encode_value(R2);
+            Vout_out.value = encode_value(Vout);
+            Ir1_out.value = encode_value(Ir1);
+        }
+
+        function update() {
+            addlog("update");
+            calc_r2form();
+            calc_r1form();
+            calc_voutform();
+            calc_vrefform();
+        }
+        
+        function setup() {
+            /*addlog("setup");*/
+            update();
+        }
+        window.addEventListener("load", (event) => {
+            setup();
+        });
+    </script>
+    <link rel="stylesheet" type="text/css" href="reset.css">
+    <style>
+        body {
+            font-family: arial, sans-serif;
+            margin: 1rem auto;
+            max-width: 40rem;
+            color: #222;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        h1 .big {
+            font-size: 2rem;
+        }
+
+        .title {
+            text-shadow: 0.2rem 0.2rem 0.4rem #DDD;
+        }
+
+        sub {
+            vertical-align: -25%;
+            font-size: 0.9rem;
+            margin-right: 0.2em;
+        }
+
+        h2 {
+            font-weight: bold;
+            font-size: 1.15rem;
+            margin: 0.2rem;
+        }
+        H2 .big {
+            font-size: 1.3rem;
+            padding-bottom: 0.1rem;
+            border-bottom: 0.15rem solid #CCC;
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.2rem;
+            border-bottom: 0.15rem solid #CCC;
+        }
+
+        .box {
+            border: solid #888 0.1rem;
+            padding: 0.5rem;
+            box-shadow: 0.5rem 0.5rem #CCC;
+        }
+
+        form {
+            display: table;
+            margin-bottom: 1em;
+            width: 100%;
+        }
+        div.block {
+            display: table-cell;
+            padding: 0 0.5rem;
+        }
+        div.inputblock {
+            display: table-row;
+        }
+        label, input {
+            display: table-cell;
+            margin-left: 0.2rem;
+            margin-bottom: 1rem;
+        }
+        input {
+            width: 10rem;
+            border-radius: 0.1rem;
+            border: 0.1em solid #888;
+            box-sizing: border-box;
+        }
+        input.error {
+            background-color: #f002;
+        }
+
+        .disabled {
+            opacity: 33%;
+        }
+
+        .log {
+            width: 100%;
+            height: 10rem;
+            overflow: scroll;
+            font-family: monospace;
+            margin: 0.5em 0;
+        }
+
+    </style>
+  </head>
+
+  <body>
+    <header>
+        <center>
+            <h1 class="title"><span class="big">FVDRC</span><br/>Feedback Voltage Divider Resistor Calculator</h1>
+        </center>
+    </header>
+    <noscript>JavaScript is required to work</noscript>
+    <center>
+        <img src="figure.gif" width="300" height="180" async>
+    </center>
+    <form class="R2form box" onchange="update()">
+        <div class="inputblock">
+            <h2><span class="big">R2</span> from V<sub>Ref</sub>, R1 and V<sub>OUT</sub></h2>
+        </div>
+        
+        <div class="block input">
+            <h3>Inputs</h3>
+            <div class="inputblock">
+                <label>V<sub>Ref</sub></label>:
+                <input type="text" name="Vref" id="Vref" inputmode="text" autocomplete required /></p>
+            </div>
+            <div class="inputblock">
+                <label>R1</label>:
+                <input type="text" name="R1" id="R1" inputmode="text" autocomplete required /></p>
+            </div>
+            <div class="inputblock disabled" aria-hidden="true">
+                <label>R2</label>:
+                <input type="text" name="R2" id="R2" placeholder="" readonly /></p>
+            </div>
+            <div class="inputblock">
+                <label>V<sub>OUT</sub></label>:
+                <input type="text" name="Vout" id="Vout" inputmode="text" autocomplete required /></p>
+            </div>
+        </div>
+        <div class="block output">
+            <h3>Outputs</h3>
+            <div class="inputblock disabled" aria-hidden="true">
+                <label>V<sub>Ref</sub></label>:
+                <input type="text" name="Vref" id="Vref" readonly /></p>
+            </div>
+            <div class="inputblock disabled" aria-hidden="true">
+                <label>R1</label>:
+                <input type="text" name="R1" id="R1" readonly /></p>
+            </div>
+            <div class="inputblock">
+                <label>R2</label>:
+                <input type="text" name="R2" id="R2" readonly /></p>
+            </div>
+            <div class="inputblock disabled" aria-hidden="true">
+                <label>V<sub>OUT</sub></label>:
+                <input type="text" name="Vout" id="Vout" readonly /></p>
+            </div>
+            <div class="inputblock">
+                <label>I<sub>R1</sub></label>:
+                <input type="text" name="Ir1" id="Ir1" readonly /></p>
+            </div>
+        </div>
+    </form>
+
+    <form class="R1form box" onchange="update()">
+        <div class="inputblock">
+            <h2><span class="big">R1</span> from V<sub>Ref</sub>, R2 and V<sub>OUT</sub></h2>
+        </div>
+        
+        <div class="block input">
+            <h3>Inputs</h3>
+            <div class="inputblock">
+                <label>V<sub>Ref</sub></label>:
+                <input type="text" name="Vref" id="Vref" inputmode="text" autocomplete required /></p>
+            </div>
+            <div class="inputblock disabled" aria-hidden="true">
+                <label>R1</label>:
+                <input type="text" name="R1" id="R1" inputmode="text" placeholder="" readonly /></p>
+            </div>
+            <div class="inputblock">
+                <label>R2</label>:
+                <input type="text" name="R2" id="R2" autocomplete required /></p>
+            </div>
+            <div class="inputblock">
+                <label>V<sub>OUT</sub></label>:
+                <input type="text" name="Vout" id="Vout" inputmode="text" autocomplete required /></p>
+            </div>
+        </div>
+        <div class="block output">
+            <h3>Outputs</h3>
+            <div class="inputblock disabled" aria-hidden="true">
+                <label>V<sub>Ref</sub></label>:
+                <input type="text" name="Vref" id="Vref" readonly /></p>
+            </div>
+            <div class="inputblock">
+                <label>R1</label>:
+                <input type="text" name="R1" id="R1" readonly /></p>
+            </div>
+            <div class="inputblock disabled" aria-hidden="true">
+                <label>R2</label>:
+                <input type="text" name="R2" id="R2" readonly /></p>
+            </div>
+            <div class="inputblock disabled" aria-hidden="true">
+                <label>V<sub>OUT</sub></label>:
+                <input type="text" name="Vout" id="Vout" readonly /></p>
+            </div>
+            <div class="inputblock">
+                <label>I<sub>R1</sub></label>:
+                <input type="text" name="Ir1" id="Ir1" readonly /></p>
+            </div>
+        </div>
+    </form>
+
+    <form class="Voutform box" onchange="update()">
+        <div class="inputblock">
+            <h2><span class="big">V<sub>OUT</sub></span> from V<sub>Ref</sub>, R1 and R2</h2>
+        </div>
+        
+        <div class="block input">
+            <h3>Inputs</h3>
+            <div class="inputblock">
+                <label>V<sub>Ref</sub></label>:
+                <input type="text" name="Vref" id="Vref" inputmode="text" autocomplete required /></p>
+            </div>
+            <div class="inputblock">
+                <label>R1</label>:
+                <input type="text" name="R1" id="R1" inputmode="text" autocomplete required /></p>
+            </div>
+            <div class="inputblock">
+                <label>R2</label>:
+                <input type="text" name="R2" id="R2" placeholder="" autocomplete required /></p>
+            </div>
+            <div class="inputblock disabled" aria-hidden="true">
+                <label>V<sub>OUT</sub></label>:
+                <input type="text" name="Vout" id="Vout" inputmode="text" readonly /></p>
+            </div>
+        </div>
+        <div class="block output">
+            <h3>Outputs</h3>
+            <div class="inputblock disabled" aria-hidden="true">
+                <label>V<sub>Ref</sub></label>:
+                <input type="text" name="Vref" id="Vref" readonly /></p>
+            </div>
+            <div class="inputblock disabled" aria-hidden="true">
+                <label>R1</label>:
+                <input type="text" name="R1" id="R1" readonly /></p>
+            </div>
+            <div class="inputblock disabled" aria-hidden="true">
+                <label>R2</label>:
+                <input type="text" name="R2" id="R2" readonly /></p>
+            </div>
+            <div class="inputblock">
+                <label>V<sub>OUT</sub></label>:
+                <input type="text" name="Vout" id="Vout" readonly /></p>
+            </div>
+            <div class="inputblock">
+                <label>I<sub>R1</sub></label>:
+                <input type="text" name="Ir1" id="Ir1" readonly /></p>
+            </div>
+        </div>
+    </form>
+
+    <form class="Vrefform box" onchange="update()">
+        <div class="inputblock">
+            <h2><span class="big">V<sub>Ref</sub></span> from R1, R2 and V<sub>OUT</sub></h2>
+        </div>
+        
+        <div class="block input">
+            <h3>Inputs</h3>
+            <div class="inputblock disabled" aria-hidden="true">
+                <label>V<sub>Ref</sub></label>:
+                <input type="text" name="Vref" id="Vref" inputmode="text" readonly /></p>
+            </div>
+            <div class="inputblock">
+                <label>R1</label>:
+                <input type="text" name="R1" id="R1" inputmode="text" autocomplete required /></p>
+            </div>
+            <div class="inputblock">
+                <label>R2</label>:
+                <input type="text" name="R2" id="R2" placeholder="" autocomplete required /></p>
+            </div>
+            <div class="inputblock">
+                <label>V<sub>OUT</sub></label>:
+                <input type="text" name="Vout" id="Vout" inputmode="text" autocomplete required /></p>
+            </div>
+        </div>
+        <div class="block output">
+            <h3>Outputs</h3>
+            <div class="inputblock">
+                <label>V<sub>Ref</sub></label>:
+                <input type="text" name="Vref" id="Vref" readonly /></p>
+            </div>
+            <div class="inputblock disabled" aria-hidden="true">
+                <label>R1</label>:
+                <input type="text" name="R1" id="R1" readonly /></p>
+            </div>
+            <div class="inputblock disabled" aria-hidden="true">
+                <label>R2</label>:
+                <input type="text" name="R2" id="R2" readonly /></p>
+            </div>
+            <div class="inputblock disabled" aria-hidden="true">
+                <label>V<sub>OUT</sub></label>:
+                <input type="text" name="Vout" id="Vout" readonly /></p>
+            </div>
+            <div class="inputblock">
+                <label>I<sub>R1</sub></label>:
+                <input type="text" name="Ir1" id="Ir1" readonly /></p>
+            </div>
+        </div>
+    </form>
+    <br>
+    <p>Log:</p>
+    <div class="log box">
+    </div>
+    <br>
+    <p>Changelog:</p>
+    <div class="log">
+        20240415 release<br>
+    </div>
+  </body>
+</html>
