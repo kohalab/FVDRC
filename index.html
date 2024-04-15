@@ -14,16 +14,16 @@
         }
 
         function decode_value(str) {
+            /* extract numbers and "." from the beginning of a line */
             let num = (str.match(/[\d|\.]*/));
+            /* If there is no input, it is assumed to be 0 */
             if(num == "" || num == null) {
                 num = "0";
             }
             num = parseFloat(num);
+            /* extract the alphabet at the end of a line */
             let unit = str.match(/[a-zA-Z]*$/);
-            /*
-            console.debug("num: \"" + num + "\"");
-            console.debug("unit: \"" + unit + "\"");
-            */
+
             switch (String(unit)) {
                 case null:
                 case "":
@@ -47,7 +47,6 @@
                 case "P":
                     return num * 1000000000000000;
                     break;
-                
                 case "m":
                     return num / 1000;
                     break;
@@ -70,9 +69,14 @@
         }
 
         function encode_value(num) {
+            /* calculate number of digits / 3 */
             let digit = Math.log10(num) / 3;
             digit = Math.floor(digit);
+            /* normalize by dividing by the number of digits */
+            /* (e.g. 1=divide by 1000, 2=divide by 1000000) */
             let normalized_num = num / Math.pow(10, digit * 3);
+            /* Convert to string with limited precision of decimal point and */
+            /* remove zeros and "." at the end of the line */
             normalized_num = String(normalized_num.toPrecision(8)).replace(/0*$/, "").replace(/\.$/, "");
             switch (digit) {
                 case 0:
@@ -119,6 +123,8 @@
             let Vref_in = document.querySelector(input_query + "#Vref");
             let R1_in = document.querySelector(input_query + "#R1");
             let R2_in = document.querySelector(input_query + "#R2");
+            let R12_in = document.querySelector(input_query + "#R12");
+            let R22_in = document.querySelector(input_query + "#R22");
             let Vout_in = document.querySelector(input_query + "#Vout");
 
             let Vref_out = document.querySelector(output_query + "#Vref");
@@ -130,8 +136,16 @@
             let Vref = decode_value(Vref_in.value);
             let R1 = decode_value(R1_in.value);
             let R2 = decode_value(R2_in.value);
+            let R12 = decode_value(R12_in.value);
+            let R22 = decode_value(R22_in.value);
             let Vout = decode_value(Vout_in.value);
             let Ir1 = 0;
+            if(R12 > 0) {
+                R1 = 1 / ((1 / R1) + (1 / R12));
+            }
+            if(R22 > 0) {
+                R2 = 1 / ((1 / R2) + (1 / R22));
+            }
 
             if(Vref == null) {
                 Vref_in.classList.add("error");
@@ -170,6 +184,8 @@
             let Vref_in = document.querySelector(input_query + "#Vref");
             let R1_in = document.querySelector(input_query + "#R1");
             let R2_in = document.querySelector(input_query + "#R2");
+            let R12_in = document.querySelector(input_query + "#R12");
+            let R22_in = document.querySelector(input_query + "#R22");
             let Vout_in = document.querySelector(input_query + "#Vout");
 
             let Vref_out = document.querySelector(output_query + "#Vref");
@@ -181,8 +197,16 @@
             let Vref = decode_value(Vref_in.value);
             let R1 = decode_value(R1_in.value);
             let R2 = decode_value(R2_in.value);
+            let R12 = decode_value(R12_in.value);
+            let R22 = decode_value(R22_in.value);
             let Vout = decode_value(Vout_in.value);
             let Ir1 = 0;
+            if(R12 > 0) {
+                R1 = 1 / ((1 / R1) + (1 / R12));
+            }
+            if(R22 > 0) {
+                R2 = 1 / ((1 / R2) + (1 / R22));
+            }
 
             if(Vref == null) {
                 Vref_in.classList.add("error");
@@ -221,6 +245,8 @@
             let Vref_in = document.querySelector(input_query + "#Vref");
             let R1_in = document.querySelector(input_query + "#R1");
             let R2_in = document.querySelector(input_query + "#R2");
+            let R12_in = document.querySelector(input_query + "#R12");
+            let R22_in = document.querySelector(input_query + "#R22");
             let Vout_in = document.querySelector(input_query + "#Vout");
 
             let Vref_out = document.querySelector(output_query + "#Vref");
@@ -232,8 +258,16 @@
             let Vref = decode_value(Vref_in.value);
             let R1 = decode_value(R1_in.value);
             let R2 = decode_value(R2_in.value);
+            let R12 = decode_value(R12_in.value);
+            let R22 = decode_value(R22_in.value);
             let Vout = decode_value(Vout_in.value);
             let Ir1 = 0;
+            if(R12 > 0) {
+                R1 = 1 / ((1 / R1) + (1 / R12));
+            }
+            if(R22 > 0) {
+                R2 = 1 / ((1 / R2) + (1 / R22));
+            }
 
             if(Vref == null) {
                 Vref_in.classList.add("error");
@@ -272,6 +306,8 @@
             let Vref_in = document.querySelector(input_query + "#Vref");
             let R1_in = document.querySelector(input_query + "#R1");
             let R2_in = document.querySelector(input_query + "#R2");
+            let R12_in = document.querySelector(input_query + "#R12");
+            let R22_in = document.querySelector(input_query + "#R22");
             let Vout_in = document.querySelector(input_query + "#Vout");
 
             let Vref_out = document.querySelector(output_query + "#Vref");
@@ -283,8 +319,16 @@
             let Vref = decode_value(Vref_in.value);
             let R1 = decode_value(R1_in.value);
             let R2 = decode_value(R2_in.value);
+            let R12 = decode_value(R12_in.value);
+            let R22 = decode_value(R22_in.value);
             let Vout = decode_value(Vout_in.value);
             let Ir1 = 0;
+            if(R12 > 0) {
+                R1 = 1 / ((1 / R1) + (1 / R12));
+            }
+            if(R22 > 0) {
+                R2 = 1 / ((1 / R2) + (1 / R22));
+            }
 
             if(Vref == null) {
                 Vref_in.classList.add("error");
@@ -353,11 +397,9 @@
         .title {
             text-shadow: 0.2rem 0.2rem 0.4rem #DDD;
         }
-
         .center{
             text-align: center;
         }
-
         sub {
             vertical-align: -25%;
             font-size: 0.9rem;
@@ -389,6 +431,11 @@
             box-shadow: 0.5rem 0.5rem #CCC;
         }
 
+        .small {
+            padding: 0 0.1rem;
+            font-size: 0.8rem;
+        }
+
         form {
             display: table;
             margin-bottom: 1em;
@@ -401,13 +448,20 @@
         div.inputblock {
             display: table-row;
         }
+
         label, input {
             display: table-cell;
             margin-left: 0.2rem;
             margin-bottom: 1rem;
         }
+        label {
+            width: 3rem;
+        }
+        
         input {
-            width: 10rem;
+            width: 6rem;
+            font-family: Menlo, "Osaka−等幅", "Osaka-mono", "ＭＳ ゴシック", monospace;
+            margin-right: 1rem;
             border-radius: 0.1rem;
             border: 0.1em solid #888;
             box-sizing: border-box;
@@ -423,8 +477,8 @@
         .log {
             width: 100%;
             height: 10rem;
+            font-family: Menlo, "Osaka−等幅", "Osaka-mono", "ＭＳ ゴシック", monospace;
             overflow: scroll;
-            font-family: monospace;
             margin: 0.5em 0;
         }
 
@@ -455,10 +509,14 @@
             <div class="inputblock">
                 <label>R1</label>:
                 <input type="text" name="R1" id="R1" inputmode="text" autocomplete required /></p>
+                <label>R1<span class="small">.2</span></label>:
+                <input type="text" name="R12" id="R12" inputmode="text" autocomplete required /></p>
             </div>
             <div class="inputblock disabled" aria-hidden="true">
                 <label>R2</label>:
                 <input type="text" name="R2" id="R2" placeholder="" readonly /></p>
+                <label>R2<span class="small">.2</span></label>:
+                <input type="text" name="R22" id="R22" placeholder="" readonly /></p>
             </div>
             <div class="inputblock">
                 <label>V<sub>OUT</sub></label>:
@@ -507,10 +565,14 @@
             <div class="inputblock disabled" aria-hidden="true">
                 <label>R1</label>:
                 <input type="text" name="R1" id="R1" inputmode="text" placeholder="" readonly /></p>
+                <label>R1<span class="small">.2</span></label>:
+                <input type="text" name="R12" id="R12" inputmode="text" placeholder="" readonly /></p>
             </div>
             <div class="inputblock">
                 <label>R2</label>:
                 <input type="text" name="R2" id="R2" autocomplete required /></p>
+                <label>R2<span class="small">.2</span></label>:
+                <input type="text" name="R22" id="R22" autocomplete required /></p>
             </div>
             <div class="inputblock">
                 <label>V<sub>OUT</sub></label>:
@@ -559,10 +621,14 @@
             <div class="inputblock">
                 <label>R1</label>:
                 <input type="text" name="R1" id="R1" inputmode="text" autocomplete required /></p>
+                <label>R1<span class="small">.2</span></label>:
+                <input type="text" name="R12" id="R12" inputmode="text" autocomplete required /></p>
             </div>
             <div class="inputblock">
                 <label>R2</label>:
                 <input type="text" name="R2" id="R2" placeholder="" autocomplete required /></p>
+                <label>R2<span class="small">.2</span></label>:
+                <input type="text" name="R22" id="R22" placeholder="" autocomplete required /></p>
             </div>
             <div class="inputblock disabled" aria-hidden="true">
                 <label>V<sub>OUT</sub></label>:
@@ -611,10 +677,14 @@
             <div class="inputblock">
                 <label>R1</label>:
                 <input type="text" name="R1" id="R1" inputmode="text" autocomplete required /></p>
+                <label>R1<span class="small">.2</span></label>:
+                <input type="text" name="R12" id="R12" inputmode="text" autocomplete required /></p>
             </div>
             <div class="inputblock">
                 <label>R2</label>:
                 <input type="text" name="R2" id="R2" placeholder="" autocomplete required /></p>
+                <label>R2<span class="small">.2</span></label>:
+                <input type="text" name="R22" id="R22" placeholder="" autocomplete required /></p>
             </div>
             <div class="inputblock">
                 <label>V<sub>OUT</sub></label>:
