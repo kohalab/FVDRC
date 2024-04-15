@@ -73,7 +73,7 @@
             let digit = Math.log10(num) / 3;
             digit = Math.floor(digit);
             let normalized_num = num / Math.pow(10, digit * 3);
-            normalized_num = String(normalized_num.toPrecision(10)).replace(/0*$/, "").replace(/\.$/, "");
+            normalized_num = String(normalized_num.toPrecision(8)).replace(/0*$/, "").replace(/\.$/, "");
             switch (digit) {
                 case 0:
                     return normalized_num + "";
@@ -354,6 +354,10 @@
             text-shadow: 0.2rem 0.2rem 0.4rem #DDD;
         }
 
+        .center{
+            text-align: center;
+        }
+
         sub {
             vertical-align: -25%;
             font-size: 0.9rem;
@@ -484,6 +488,9 @@
                 <input type="text" name="Ir1" id="Ir1" readonly /></p>
             </div>
         </div>
+        <div class="inputblock center">
+            R2 = R1 / ((V<sub>OUT</sub> / V<sub>Ref</sub>) - 1);
+        </div>
     </form>
 
     <form class="R1form box" onchange="update()">
@@ -532,6 +539,9 @@
                 <label>I<sub>R1</sub></label>:
                 <input type="text" name="Ir1" id="Ir1" readonly /></p>
             </div>
+        </div>
+        <div class="inputblock center">
+            R1 = R2 * ((V<sub>OUT</sub> / V<sub>Ref</sub>) - 1)
         </div>
     </form>
 
@@ -582,6 +592,9 @@
                 <input type="text" name="Ir1" id="Ir1" readonly /></p>
             </div>
         </div>
+        <div class="inputblock center">
+            V<sub>OUT</sub> = V<sub>Ref</sub> * (1 + (R1 / R2))
+        </div>
     </form>
 
     <form class="Vrefform box" onchange="update()">
@@ -630,6 +643,9 @@
                 <label>I<sub>R1</sub></label>:
                 <input type="text" name="Ir1" id="Ir1" readonly /></p>
             </div>
+        </div>
+        <div class="inputblock center">
+            V<sub>Ref</sub> = V<sub>OUT</sub> / (1 + (R1 / R2))
         </div>
     </form>
     <br>
