@@ -77,7 +77,7 @@
             let normalized_num = num / Math.pow(10, digit * 3);
             /* Convert to string with limited precision of decimal point and */
             /* remove zeros and "." at the end of the line */
-            normalized_num = String(normalized_num.toPrecision(8)).replace(/0*$/, "").replace(/\.$/, "");
+            normalized_num = String(normalized_num.toPrecision(6)).replace(/0*$/, "").replace(/\.$/, "");
             switch (digit) {
                 case 0:
                     return normalized_num + "";
