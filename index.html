@@ -380,19 +380,14 @@
     <link rel="stylesheet" type="text/css" href="reset.css">
     <style>
         body {
-            font-family: arial, sans-serif;
+            font-family: Verdana, Roboto, "Droid Sans", "游ゴシック", YuGothic, "メイリオ", Meiryo, arial, sans-serif;
             margin: 1rem auto;
             max-width: 40rem;
             color: #222;
         }
-        @media screen and (max-width: 45rem) and (min-width: 35rem) {
+        @media screen and (max-width: 44rem) {
             html {
-                font-size: 0.8em;
-            }
-        }
-        @media screen and (max-width: 35rem) {
-            html {
-                font-size: 0.5em;
+                font-size: 2.27vw;
             }
         }
 
@@ -407,6 +402,12 @@
         .title {
             text-shadow: 0.2rem 0.2rem 0.4rem #DDD;
         }
+
+        img {
+            max-width: 80%;
+            height: auto;
+        }
+
         .center{
             text-align: center;
         }
@@ -437,6 +438,7 @@
 
         .box {
             border: solid #888 0.1rem;
+            width: calc(100% - 1rem);
             padding: 0.5rem;
             box-shadow: 0.5rem 0.5rem #CCC;
         }
@@ -449,7 +451,6 @@
         form {
             display: table;
             margin-bottom: 1em;
-            width: 100%;
         }
         div.block {
             display: table-cell;
@@ -486,7 +487,6 @@
         }
 
         .log {
-            width: 100%;
             height: 10rem;
             font-family: Menlo, "Osaka−等幅", "Osaka-mono", "ＭＳ ゴシック", monospace;
             overflow: scroll;
@@ -737,6 +737,8 @@
     <p>Changelog:</p>
     <div class="log">
         20240415 release<br>
+        20240416 support responsive<br>
     </div>
+    <center>created by kohanii</center>
   </body>
 </html>
