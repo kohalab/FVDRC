@@ -1,4 +1,30 @@
 <!DOCTYPE html>
+<!--
+    This is free and unencumbered software released into the public domain.
+
+    Anyone is free to copy, modify, publish, use, compile, sell, or
+    distribute this software, either in source code form or as a compiled
+    binary, for any purpose, commercial or non-commercial, and by any
+    means.
+
+    In jurisdictions that recognize copyright laws, the author or authors
+    of this software dedicate any and all copyright interest in the
+    software to the public domain. We make this dedication for the benefit
+    of the public at large and to the detriment of our heirs and
+    successors. We intend this dedication to be an overt act of
+    relinquishment in perpetuity of all present and future rights to this
+    software under copyright law.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+    OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+    ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+    OTHER DEALINGS IN THE SOFTWARE.
+
+    For more information, please refer to <https://unlicense.org>
+-->
 <html>
   <head>
     <meta charset="UTF-8">
@@ -149,6 +175,8 @@
             let R2_in = document.querySelector(input_query + "#R2");
             let R12_in = document.querySelector(input_query + "#R12");
             let R22_in = document.querySelector(input_query + "#R22");
+            let R13_in = document.querySelector(input_query + "#R13");
+            let R23_in = document.querySelector(input_query + "#R23");
             let Vout_in = document.querySelector(input_query + "#Vout");
             let series_in = document.querySelector(input_query + "#series");
 
@@ -163,6 +191,8 @@
             let R2 = decode_value(R2_in.value);
             let R12 = decode_value(R12_in.value);
             let R22 = decode_value(R22_in.value);
+            let R13 = decode_value(R13_in.value);
+            let R23 = decode_value(R23_in.value);
             let Vout = decode_value(Vout_in.value);
             let Ir1 = 0;
             if(R12 > 0) {
@@ -170,6 +200,12 @@
             }
             if(R22 > 0) {
                 R2 = 1 / ((1 / R2) + (1 / R22));
+            }
+            if(R13 > 0) {
+                R1 += R13;
+            }
+            if(R23 > 0) {
+                R2 += R23;
             }
 
             let list = null;
@@ -238,6 +274,8 @@
             let R2_in = document.querySelector(input_query + "#R2");
             let R12_in = document.querySelector(input_query + "#R12");
             let R22_in = document.querySelector(input_query + "#R22");
+            let R13_in = document.querySelector(input_query + "#R13");
+            let R23_in = document.querySelector(input_query + "#R23");
             let Vout_in = document.querySelector(input_query + "#Vout");
             let series_in = document.querySelector(input_query + "#series");
 
@@ -252,6 +290,8 @@
             let R2 = decode_value(R2_in.value);
             let R12 = decode_value(R12_in.value);
             let R22 = decode_value(R22_in.value);
+            let R13 = decode_value(R13_in.value);
+            let R23 = decode_value(R23_in.value);
             let Vout = decode_value(Vout_in.value);
             let Ir1 = 0;
             if(R12 > 0) {
@@ -259,6 +299,12 @@
             }
             if(R22 > 0) {
                 R2 = 1 / ((1 / R2) + (1 / R22));
+            }
+            if(R13 > 0) {
+                R1 += R13;
+            }
+            if(R23 > 0) {
+                R2 += R23;
             }
 
             let list = null;
@@ -327,7 +373,10 @@
             let R2_in = document.querySelector(input_query + "#R2");
             let R12_in = document.querySelector(input_query + "#R12");
             let R22_in = document.querySelector(input_query + "#R22");
+            let R13_in = document.querySelector(input_query + "#R13");
+            let R23_in = document.querySelector(input_query + "#R23");
             let Vout_in = document.querySelector(input_query + "#Vout");
+            let series_in = document.querySelector(input_query + "#series");
 
             let Vref_out = document.querySelector(output_query + "#Vref");
             let R1_out = document.querySelector(output_query + "#R1");
@@ -340,6 +389,8 @@
             let R2 = decode_value(R2_in.value);
             let R12 = decode_value(R12_in.value);
             let R22 = decode_value(R22_in.value);
+            let R13 = decode_value(R13_in.value);
+            let R23 = decode_value(R23_in.value);
             let Vout = decode_value(Vout_in.value);
             let Ir1 = 0;
             if(R12 > 0) {
@@ -347,6 +398,12 @@
             }
             if(R22 > 0) {
                 R2 = 1 / ((1 / R2) + (1 / R22));
+            }
+            if(R13 > 0) {
+                R1 += R13;
+            }
+            if(R23 > 0) {
+                R2 += R23;
             }
 
             if(Vref == null) {
@@ -385,6 +442,10 @@
             const output_query = ".Eroundform .output "
             let R1_in = document.querySelector(input_query + "#R1");
             let R2_in = document.querySelector(input_query + "#R2");
+            let R12_in = document.querySelector(input_query + "#R12");
+            let R22_in = document.querySelector(input_query + "#R22");
+            let R13_in = document.querySelector(input_query + "#R13");
+            let R23_in = document.querySelector(input_query + "#R23");
             let series_in = document.querySelector(input_query + "#series");
 
             let R1_out = document.querySelector(output_query + "#R1");
@@ -395,6 +456,22 @@
 
             let R1 = decode_value(R1_in.value);
             let R2 = decode_value(R2_in.value);
+            let R12 = decode_value(R12_in.value);
+            let R22 = decode_value(R22_in.value);
+            let R13 = decode_value(R13_in.value);
+            let R23 = decode_value(R23_in.value);
+            if(R12 > 0) {
+                R1 = 1 / ((1 / R1) + (1 / R12));
+            }
+            if(R22 > 0) {
+                R2 = 1 / ((1 / R2) + (1 / R22));
+            }
+            if(R13 > 0) {
+                R1 += R13;
+            }
+            if(R23 > 0) {
+                R2 += R23;
+            }
 
             if(R1 == null) {
                 R1_in.classList.add("error");
@@ -455,7 +532,10 @@
             let R2_in = document.querySelector(input_query + "#R2");
             let R12_in = document.querySelector(input_query + "#R12");
             let R22_in = document.querySelector(input_query + "#R22");
+            let R13_in = document.querySelector(input_query + "#R13");
+            let R23_in = document.querySelector(input_query + "#R23");
             let Vout_in = document.querySelector(input_query + "#Vout");
+            let series_in = document.querySelector(input_query + "#series");
 
             let Vref_out = document.querySelector(output_query + "#Vref");
             let R1_out = document.querySelector(output_query + "#R1");
@@ -468,6 +548,8 @@
             let R2 = decode_value(R2_in.value);
             let R12 = decode_value(R12_in.value);
             let R22 = decode_value(R22_in.value);
+            let R13 = decode_value(R13_in.value);
+            let R23 = decode_value(R23_in.value);
             let Vout = decode_value(Vout_in.value);
             let Ir1 = 0;
             if(R12 > 0) {
@@ -475,6 +557,12 @@
             }
             if(R22 > 0) {
                 R2 = 1 / ((1 / R2) + (1 / R22));
+            }
+            if(R13 > 0) {
+                R1 += R13;
+            }
+            if(R23 > 0) {
+                R2 += R23;
             }
 
             if(Vref == null) {
@@ -530,12 +618,12 @@
         body {
             font-family: Verdana, Roboto, "Droid Sans", "游ゴシック", YuGothic, "メイリオ", Meiryo, arial, sans-serif;
             margin: 1rem auto;
-            max-width: 40rem;
+            max-width: 45rem;
             color: #222;
         }
-        @media screen and (max-width: 44rem) {
+        @media screen and (max-width: 48rem) {
             html {
-                font-size: 2.27vw;
+                font-size: 2.1vw;
             }
         }
 
@@ -611,17 +699,23 @@
         label, input {
             display: table-cell;
             margin-left: 0.2rem;
+            margin-right: 0.2rem;
             margin-bottom: 1rem;
         }
-        label {
+        label.label {
             width: 4rem;
+        }
+        label.symbol {
+            padding-left: 0.25rem;
+            padding-right: 0.25rem;
         }
         
         input, select {
-            width: 5rem;
+            width: 6rem;
             font-family: Menlo, "Osaka−等幅", "Osaka-mono", "ＭＳ ゴシック", monospace;
             font-size: 1rem;
-            margin-right: 1rem;
+            margin-left: 0.5rem;
+            margin-right: 0.5rem;
             border-radius: 0.1rem;
             border: 0.1em solid #888;
             box-sizing: border-box;
@@ -681,23 +775,27 @@
                 <input type="text" name="Vref" id="Vref" inputmode="text" autocomplete required />
             </div>
             <div class="inputblock">
-                <label>R1</label>:
+                <label class="label">R1</label>:
                 <input type="text" name="R1" id="R1" inputmode="text" autocomplete required />
-                <label>R1<span class="small">.2</span></label>:
+                <label class="symbol">//</label>
                 <input type="text" name="R12" id="R12" inputmode="text" autocomplete required />
+                <label class="symbol">+</label>
+                <input type="text" name="R13" id="R13" inputmode="text" autocomplete required />
             </div>
             <div class="inputblock disabled" aria-hidden="true">
-                <label>R2</label>:
+                <label class="label">R2</label>:
                 <input type="text" name="R2" id="R2" placeholder="" readonly />
-                <label>R2<span class="small">.2</span></label>:
+                <label class="symbol">//</label>
                 <input type="text" name="R22" id="R22" placeholder="" readonly />
+                <label class="symbol">+</label>
+                <input type="text" name="R23" id="R23" placeholder="" readonly />
             </div>
             <div class="inputblock">
-                <label>V<sub>OUT</sub></label>:
+                <label class="label">V<sub>OUT</sub></label>:
                 <input type="text" name="Vout" id="Vout" inputmode="text" autocomplete required />
             </div>
             <div class="inputblock">
-                <label>E series</label>:
+                <label class="label">E series</label>:
                 <select name="series" id="series" inputmode>
                     <option value="E3">E3</option>
                     <option value="E6">E6</option>
@@ -712,23 +810,23 @@
         <div class="block output">
             <h3>Outputs</h3>
             <div class="inputblock disabled" aria-hidden="true">
-                <label>V<sub>Ref</sub></label>:
+                <label class="label">V<sub>Ref</sub></label>:
                 <input type="text" name="Vref" id="Vref" readonly />
             </div>
             <div class="inputblock disabled" aria-hidden="true">
-                <label>R1</label>:
+                <label class="label">R1</label>:
                 <input type="text" name="R1" id="R1" readonly />
             </div>
             <div class="inputblock">
-                <label>R2</label>:
+                <label class="label">R2</label>:
                 <input type="text" name="R2" id="R2" readonly />
             </div>
             <div class="inputblock">
-                <label>V<sub>OUT</sub></label>:
+                <label class="label">V<sub>OUT</sub></label>:
                 <input type="text" name="Vout" id="Vout" readonly />
             </div>
             <div class="inputblock">
-                <label>I<sub>R1</sub></label>:
+                <label class="label">I<sub>R1</sub></label>:
                 <input type="text" name="Ir1" id="Ir1" readonly />
             </div>
         </div>
@@ -745,27 +843,31 @@
         <div class="block input">
             <h3>Inputs</h3>
             <div class="inputblock">
-                <label>V<sub>Ref</sub></label>:
+                <label class="label">V<sub>Ref</sub></label>:
                 <input type="text" name="Vref" id="Vref" inputmode="text" autocomplete required />
             </div>
             <div class="inputblock disabled" aria-hidden="true">
-                <label>R1</label>:
-                <input type="text" name="R1" id="R1" inputmode="text" placeholder="" readonly />
-                <label>R1<span class="small">.2</span></label>:
-                <input type="text" name="R12" id="R12" inputmode="text" placeholder="" readonly />
+                <label class="label">R1</label>:
+                <input type="text" name="R1" id="R1" inputmode="text" readonly/>
+                <label class="symbol">//</label>
+                <input type="text" name="R12" id="R12" inputmode="text" readonly />
+                <label class="symbol">+</label>
+                <input type="text" name="R13" id="R13" inputmode="text" readonly />
             </div>
             <div class="inputblock">
-                <label>R2</label>:
-                <input type="text" name="R2" id="R2" autocomplete required />
-                <label>R2<span class="small">.2</span></label>:
-                <input type="text" name="R22" id="R22" autocomplete required />
+                <label class="label">R2</label>:
+                <input type="text" name="R2" id="R2" placeholder="" autocomplete required  />
+                <label class="symbol">//</label>
+                <input type="text" name="R22" id="R22" placeholder="" autocomplete required  />
+                <label class="symbol">+</label>
+                <input type="text" name="R23" id="R23" placeholder="" autocomplete required  />
             </div>
             <div class="inputblock">
-                <label>V<sub>OUT</sub></label>:
+                <label class="label">V<sub>OUT</sub></label>:
                 <input type="text" name="Vout" id="Vout" inputmode="text" autocomplete required />
             </div>
             <div class="inputblock">
-                <label>E series</label>:
+                <label class="label">E series</label>:
                 <select name="series" id="series" inputmode>
                     <option value="E3">E3</option>
                     <option value="E6">E6</option>
@@ -780,23 +882,23 @@
         <div class="block output">
             <h3>Outputs</h3>
             <div class="inputblock disabled" aria-hidden="true">
-                <label>V<sub>Ref</sub></label>:
+                <label class="label">V<sub>Ref</sub></label>:
                 <input type="text" name="Vref" id="Vref" readonly />
             </div>
             <div class="inputblock">
-                <label>R1</label>:
+                <label class="label">R1</label>:
                 <input type="text" name="R1" id="R1" readonly />
             </div>
             <div class="inputblock disabled" aria-hidden="true">
-                <label>R2</label>:
+                <label class="label">R2</label>:
                 <input type="text" name="R2" id="R2" readonly />
             </div>
             <div class="inputblock">
-                <label>V<sub>OUT</sub></label>:
+                <label class="label">V<sub>OUT</sub></label>:
                 <input type="text" name="Vout" id="Vout" readonly />
             </div>
             <div class="inputblock">
-                <label>I<sub>R1</sub></label>:
+                <label class="label">I<sub>R1</sub></label>:
                 <input type="text" name="Ir1" id="Ir1" readonly />
             </div>
         </div>
@@ -813,15 +915,23 @@
         <div class="block input">
             <h3>Inputs</h3>
             <div class="inputblock">
-                <label>R1</label>:
+                <label class="label">R1</label>:
                 <input type="text" name="R1" id="R1" inputmode="text" autocomplete required />
+                <label class="symbol">//</label>
+                <input type="text" name="R12" id="R12" inputmode="text" autocomplete required />
+                <label class="symbol">+</label>
+                <input type="text" name="R13" id="R13" inputmode="text" autocomplete required />
             </div>
             <div class="inputblock">
-                <label>R2</label>:
-                <input type="text" name="R2" id="R2" placeholder="" autocomplete required />
+                <label class="label">R2</label>:
+                <input type="text" name="R2" id="R2" placeholder="" autocomplete required  />
+                <label class="symbol">//</label>
+                <input type="text" name="R22" id="R22" placeholder="" autocomplete required  />
+                <label class="symbol">+</label>
+                <input type="text" name="R23" id="R23" placeholder="" autocomplete required  />
             </div>
             <div class="inputblock">
-                <label>E series</label>:
+                <label class="label">E series</label>:
                 <select name="series" id="series" inputmode>
                     <option value="E3">E3</option>
                     <option value="E6">E6</option>
@@ -837,15 +947,19 @@
         <div class="block output">
             <h3>Outputs</h3>
             <div class="inputblock">
-                <label>R1</label>:
+                <label class="label">R1</label>:
                 <input type="text" name="R1" id="R1" readonly />
-                <label>Error</label>:
+            </div>
+            <div class="inputblock">
+                <label>R1 Err</label>:
                 <input type="text" name="R1e" id="R1e" readonly />%
             </div>
             <div class="inputblock">
-                <label>R2</label>:
+                <label class="label">R2</label>:
                 <input type="text" name="R2" id="R2" readonly />
-                <label>Error</label>:
+            </div>
+            <div class="inputblock">
+                <label>R2 Err</label>:
                 <input type="text" name="R2e" id="R2e" readonly />%
             </div>
         </div>
@@ -859,46 +973,50 @@
         <div class="block input">
             <h3>Inputs</h3>
             <div class="inputblock">
-                <label>V<sub>Ref</sub></label>:
+                <label class="label">V<sub>Ref</sub></label>:
                 <input type="text" name="Vref" id="Vref" inputmode="text" autocomplete required />
             </div>
             <div class="inputblock">
-                <label>R1</label>:
+                <label class="label">R1</label>:
                 <input type="text" name="R1" id="R1" inputmode="text" autocomplete required />
-                <label>R1<span class="small">.2</span></label>:
+                <label class="symbol">//</label>
                 <input type="text" name="R12" id="R12" inputmode="text" autocomplete required />
+                <label class="symbol">+</label>
+                <input type="text" name="R13" id="R13" inputmode="text" autocomplete required />
             </div>
             <div class="inputblock">
-                <label>R2</label>:
-                <input type="text" name="R2" id="R2" placeholder="" autocomplete required />
-                <label>R2<span class="small">.2</span></label>:
-                <input type="text" name="R22" id="R22" placeholder="" autocomplete required />
+                <label class="label">R2</label>:
+                <input type="text" name="R2" id="R2" placeholder="" autocomplete required  />
+                <label class="symbol">//</label>
+                <input type="text" name="R22" id="R22" placeholder="" autocomplete required  />
+                <label class="symbol">+</label>
+                <input type="text" name="R23" id="R23" placeholder="" autocomplete required  />
             </div>
             <div class="inputblock disabled" aria-hidden="true">
-                <label>V<sub>OUT</sub></label>:
+                <label class="label">V<sub>OUT</sub></label>:
                 <input type="text" name="Vout" id="Vout" inputmode="text" readonly />
             </div>
         </div>
         <div class="block output">
             <h3>Outputs</h3>
             <div class="inputblock disabled" aria-hidden="true">
-                <label>V<sub>Ref</sub></label>:
+                <label class="label">V<sub>Ref</sub></label>:
                 <input type="text" name="Vref" id="Vref" readonly />
             </div>
             <div class="inputblock disabled" aria-hidden="true">
-                <label>R1</label>:
+                <label class="label">R1</label>:
                 <input type="text" name="R1" id="R1" readonly />
             </div>
             <div class="inputblock disabled" aria-hidden="true">
-                <label>R2</label>:
+                <label class="label">R2</label>:
                 <input type="text" name="R2" id="R2" readonly />
             </div>
             <div class="inputblock">
-                <label>V<sub>OUT</sub></label>:
+                <label class="label">V<sub>OUT</sub></label>:
                 <input type="text" name="Vout" id="Vout" readonly />
             </div>
             <div class="inputblock">
-                <label>I<sub>R1</sub></label>:
+                <label class="label">I<sub>R1</sub></label>:
                 <input type="text" name="Ir1" id="Ir1" readonly />
             </div>
         </div>
@@ -915,46 +1033,50 @@
         <div class="block input">
             <h3>Inputs</h3>
             <div class="inputblock disabled" aria-hidden="true">
-                <label>V<sub>Ref</sub></label>:
+                <label class="label">V<sub>Ref</sub></label>:
                 <input type="text" name="Vref" id="Vref" inputmode="text" readonly />
             </div>
             <div class="inputblock">
-                <label>R1</label>:
+                <label class="label">R1</label>:
                 <input type="text" name="R1" id="R1" inputmode="text" autocomplete required />
-                <label>R1<span class="small">.2</span></label>:
+                <label class="symbol">//</label>
                 <input type="text" name="R12" id="R12" inputmode="text" autocomplete required />
+                <label class="symbol">+</label>
+                <input type="text" name="R13" id="R13" inputmode="text" autocomplete required />
             </div>
             <div class="inputblock">
-                <label>R2</label>:
-                <input type="text" name="R2" id="R2" placeholder="" autocomplete required />
-                <label>R2<span class="small">.2</span></label>:
-                <input type="text" name="R22" id="R22" placeholder="" autocomplete required />
+                <label class="label">R2</label>:
+                <input type="text" name="R2" id="R2" placeholder="" autocomplete required  />
+                <label class="symbol">//</label>
+                <input type="text" name="R22" id="R22" placeholder="" autocomplete required  />
+                <label class="symbol">+</label>
+                <input type="text" name="R23" id="R23" placeholder="" autocomplete required  />
             </div>
             <div class="inputblock">
-                <label>V<sub>OUT</sub></label>:
+                <label class="label">V<sub>OUT</sub></label>:
                 <input type="text" name="Vout" id="Vout" inputmode="text" autocomplete required />
             </div>
         </div>
         <div class="block output">
             <h3>Outputs</h3>
             <div class="inputblock">
-                <label>V<sub>Ref</sub></label>:
+                <label class="label">V<sub>Ref</sub></label>:
                 <input type="text" name="Vref" id="Vref" readonly />
             </div>
             <div class="inputblock disabled" aria-hidden="true">
-                <label>R1</label>:
+                <label class="label">R1</label>:
                 <input type="text" name="R1" id="R1" readonly />
             </div>
             <div class="inputblock disabled" aria-hidden="true">
-                <label>R2</label>:
+                <label class="label">R2</label>:
                 <input type="text" name="R2" id="R2" readonly />
             </div>
             <div class="inputblock disabled" aria-hidden="true">
-                <label>V<sub>OUT</sub></label>:
+                <label class="label">V<sub>OUT</sub></label>:
                 <input type="text" name="Vout" id="Vout" readonly />
             </div>
             <div class="inputblock">
-                <label>I<sub>R1</sub></label>:
+                <label class="label">I<sub>R1</sub></label>:
                 <input type="text" name="Ir1" id="Ir1" readonly />
             </div>
         </div>
@@ -999,6 +1121,7 @@
         20240416 support responsive<br>
         20240416 add Round to E series<br>
         20240417 minor modification of HTML<br>
+        20240509 add Series Resistor input and License text in HTML<br>
     </div>
     <center>created by kohanii</center>
   </body>
