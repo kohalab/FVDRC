@@ -264,6 +264,20 @@
             R2_out.value = encode_value(R2);
             Vout_out.value = encode_value(Vout);
             Ir1_out.value = encode_value(Ir1);
+
+            /* Warning if resistor power consumption exceeds 1W */
+            if((Ir1 * Vout) > 1) {
+                Ir1_out.classList.add("error");
+                Ir1_out.classList.remove("warning");
+            } else {
+                Ir1_out.classList.remove("error");
+                /* Warning if resistor power consumption exceeds 0.25W */
+                if((Ir1 * Vout) > 0.25) {
+                    Ir1_out.classList.add("warning");
+                } else {
+                    Ir1_out.classList.remove("warning");
+                }
+            }
         }
 
         function calc_r1form() {
@@ -363,6 +377,20 @@
             R2_out.value = encode_value(R2);
             Vout_out.value = encode_value(Vout);
             Ir1_out.value = encode_value(Ir1);
+
+            /* Warning if resistor power consumption exceeds 1W */
+            if((Ir1 * Vout) > 1) {
+                Ir1_out.classList.add("error");
+                Ir1_out.classList.remove("warning");
+            } else {
+                Ir1_out.classList.remove("error");
+                /* Warning if resistor power consumption exceeds 0.25W */
+                if((Ir1 * Vout) > 0.25) {
+                    Ir1_out.classList.add("warning");
+                } else {
+                    Ir1_out.classList.remove("warning");
+                }
+            }
         }
 
         function calc_voutform() {
@@ -435,6 +463,20 @@
             R2_out.value = encode_value(R2);
             Vout_out.value = encode_value(Vout);
             Ir1_out.value = encode_value(Ir1);
+
+            /* Warning if resistor power consumption exceeds 1W */
+            if((Ir1 * Vout) > 1) {
+                Ir1_out.classList.add("error");
+                Ir1_out.classList.remove("warning");
+            } else {
+                Ir1_out.classList.remove("error");
+                /* Warning if resistor power consumption exceeds 0.25W */
+                if((Ir1 * Vout) > 0.25) {
+                    Ir1_out.classList.add("warning");
+                } else {
+                    Ir1_out.classList.remove("warning");
+                }
+            }
         }
 
         function calc_eroundform() {
@@ -594,6 +636,20 @@
             R2_out.value = encode_value(R2);
             Vout_out.value = encode_value(Vout);
             Ir1_out.value = encode_value(Ir1);
+
+            /* Warning if resistor power consumption exceeds 1W */
+            if((Ir1 * Vout) > 1) {
+                Ir1_out.classList.add("error");
+                Ir1_out.classList.remove("warning");
+            } else {
+                Ir1_out.classList.remove("error");
+                /* Warning if resistor power consumption exceeds 0.25W */
+                if((Ir1 * Vout) > 0.25) {
+                    Ir1_out.classList.add("warning");
+                } else {
+                    Ir1_out.classList.remove("warning");
+                }
+            }
         }
 
         function update() {
@@ -621,6 +677,7 @@
             max-width: 45rem;
             color: #222;
         }
+
         @media screen and (max-width: 48rem) {
             html {
                 font-size: 2.1vw;
@@ -718,14 +775,35 @@
             margin-right: 0.5rem;
             border-radius: 0.1rem;
             border: 0.1em solid #888;
+            background-color: #fff;
+            color: #000;
             box-sizing: border-box;
         }
-        input.error {
-            background-color: #f002;
+
+        input::placeholder {
+            color: #666;
+        }
+
+        input:placeholder-shown.optional {
+            background-image: url("option.gif");
+            image-rendering: pixelated;
+            background-size: 8px 8px;
+        }
+
+        input.error, input:required:invalid {
+            background-image: url("error.gif");
+            image-rendering: pixelated;
+            background-size: 8px 8px;
+        }
+
+        input.warning {
+            background-image: url("warning.gif");
+            image-rendering: pixelated;
+            background-size: 8px 8px;
         }
 
         .disabled {
-            opacity: 33%;
+            opacity: 50%;
         }
 
         .log {
@@ -745,11 +823,11 @@
             font-family: Menlo, "Osaka−等幅", "Osaka-mono", "ＭＳ ゴシック", monospace;
             font-size: 1rem;
         }
+
         .elist li{
             margin: 0.5em 0;
             font-size: 1.2rem;
         }
-
     </style>
   </head>
 
@@ -778,17 +856,17 @@
                 <label class="label">R1</label>:
                 <input type="text" name="R1" id="R1" inputmode="text" autocomplete required />
                 <label class="symbol">//</label>
-                <input type="text" name="R12" id="R12" inputmode="text" autocomplete required />
+                <input type="text" class="optional" name="R12" id="R12" placeholder="Infinity" inputmode="text" autocomplete />
                 <label class="symbol">+</label>
-                <input type="text" name="R13" id="R13" inputmode="text" autocomplete required />
+                <input type="text" class="optional" name="R13" id="R13" placeholder="0" inputmode="text" autocomplete />
             </div>
             <div class="inputblock disabled" aria-hidden="true">
                 <label class="label">R2</label>:
                 <input type="text" name="R2" id="R2" placeholder="" readonly />
                 <label class="symbol">//</label>
-                <input type="text" name="R22" id="R22" placeholder="" readonly />
+                <input type="text" class="optional" name="R22" id="R22" placeholder="Infinity" placeholder="" readonly />
                 <label class="symbol">+</label>
-                <input type="text" name="R23" id="R23" placeholder="" readonly />
+                <input type="text" class="optional" name="R23" id="R23" placeholder="0" placeholder="" readonly />
             </div>
             <div class="inputblock">
                 <label class="label">V<sub>OUT</sub></label>:
@@ -850,17 +928,17 @@
                 <label class="label">R1</label>:
                 <input type="text" name="R1" id="R1" inputmode="text" readonly/>
                 <label class="symbol">//</label>
-                <input type="text" name="R12" id="R12" inputmode="text" readonly />
+                <input type="text" class="optional" name="R12" id="R12" placeholder="Infinity" readonly />
                 <label class="symbol">+</label>
-                <input type="text" name="R13" id="R13" inputmode="text" readonly />
+                <input type="text" class="optional" name="R13" id="R13" placeholder="0" inputmode="text" readonly />
             </div>
             <div class="inputblock">
                 <label class="label">R2</label>:
                 <input type="text" name="R2" id="R2" placeholder="" autocomplete required  />
                 <label class="symbol">//</label>
-                <input type="text" name="R22" id="R22" placeholder="" autocomplete required  />
+                <input type="text" class="optional" name="R22" id="R22" placeholder="Infinity" autocomplete  />
                 <label class="symbol">+</label>
-                <input type="text" name="R23" id="R23" placeholder="" autocomplete required  />
+                <input type="text" class="optional" name="R23" id="R23" placeholder="0" autocomplete  />
             </div>
             <div class="inputblock">
                 <label class="label">V<sub>OUT</sub></label>:
@@ -918,17 +996,17 @@
                 <label class="label">R1</label>:
                 <input type="text" name="R1" id="R1" inputmode="text" autocomplete required />
                 <label class="symbol">//</label>
-                <input type="text" name="R12" id="R12" inputmode="text" autocomplete required />
+                <input type="text" class="optional" name="R12" id="R12" placeholder="Infinity" inputmode="text" autocomplete />
                 <label class="symbol">+</label>
-                <input type="text" name="R13" id="R13" inputmode="text" autocomplete required />
+                <input type="text" class="optional" name="R13" id="R13" placeholder="0" inputmode="text" autocomplete />
             </div>
             <div class="inputblock">
                 <label class="label">R2</label>:
                 <input type="text" name="R2" id="R2" placeholder="" autocomplete required  />
                 <label class="symbol">//</label>
-                <input type="text" name="R22" id="R22" placeholder="" autocomplete required  />
+                <input type="text" class="optional" name="R22" id="R22" placeholder="Infinity" autocomplete />
                 <label class="symbol">+</label>
-                <input type="text" name="R23" id="R23" placeholder="" autocomplete required  />
+                <input type="text" class="optional" name="R23" id="R23" placeholder="0" autocomplete />
             </div>
             <div class="inputblock">
                 <label class="label">E series</label>:
@@ -980,17 +1058,17 @@
                 <label class="label">R1</label>:
                 <input type="text" name="R1" id="R1" inputmode="text" autocomplete required />
                 <label class="symbol">//</label>
-                <input type="text" name="R12" id="R12" inputmode="text" autocomplete required />
+                <input type="text" class="optional" name="R12" id="R12" placeholder="Infinity" inputmode="text" autocomplete />
                 <label class="symbol">+</label>
-                <input type="text" name="R13" id="R13" inputmode="text" autocomplete required />
+                <input type="text" class="optional" name="R13" id="R13" placeholder="0" inputmode="text" autocomplete />
             </div>
             <div class="inputblock">
                 <label class="label">R2</label>:
                 <input type="text" name="R2" id="R2" placeholder="" autocomplete required  />
                 <label class="symbol">//</label>
-                <input type="text" name="R22" id="R22" placeholder="" autocomplete required  />
+                <input type="text" class="optional" name="R22" id="R22" placeholder="Infinity" placeholder="" autocomplete  />
                 <label class="symbol">+</label>
-                <input type="text" name="R23" id="R23" placeholder="" autocomplete required  />
+                <input type="text" class="optional" name="R23" id="R23" placeholder="0" autocomplete  />
             </div>
             <div class="inputblock disabled" aria-hidden="true">
                 <label class="label">V<sub>OUT</sub></label>:
@@ -1040,17 +1118,17 @@
                 <label class="label">R1</label>:
                 <input type="text" name="R1" id="R1" inputmode="text" autocomplete required />
                 <label class="symbol">//</label>
-                <input type="text" name="R12" id="R12" inputmode="text" autocomplete required />
+                <input type="text" class="optional" name="R12" id="R12" placeholder="Infinity" inputmode="text" autocomplete />
                 <label class="symbol">+</label>
-                <input type="text" name="R13" id="R13" inputmode="text" autocomplete required />
+                <input type="text" class="optional" name="R13" id="R13" placeholder="0" inputmode="text" autocomplete />
             </div>
             <div class="inputblock">
                 <label class="label">R2</label>:
                 <input type="text" name="R2" id="R2" placeholder="" autocomplete required  />
                 <label class="symbol">//</label>
-                <input type="text" name="R22" id="R22" placeholder="" autocomplete required  />
+                <input type="text" class="optional" name="R22" id="R22" placeholder="Infinity" autocomplete />
                 <label class="symbol">+</label>
-                <input type="text" name="R23" id="R23" placeholder="" autocomplete required  />
+                <input type="text" class="optional" name="R23" id="R23" placeholder="0" autocomplete />
             </div>
             <div class="inputblock">
                 <label class="label">V<sub>OUT</sub></label>:
@@ -1122,7 +1200,8 @@
         20240416 add Round to E series<br>
         20240417 minor modification of HTML<br>
         20240509 add Series Resistor input and License text in HTML<br>
+        20240619 minor visual changes<br>
     </div>
-    <center>created by kohanii</center>
+    <center>created by <a href="https://kohacraft.com/archives/author/kohanii">kohanii</a></center>
   </body>
 </html>
