@@ -103,7 +103,7 @@
             let normalized_num = num / Math.pow(10, digit * 3);
             /* Convert to string with limited precision of decimal point and */
             /* remove zeros and "." at the end of the line */
-            normalized_num = String(normalized_num.toPrecision(5)).replace(/0*$/, "").replace(/\.$/, "");
+            normalized_num = String(normalized_num.toFixed(3)).replace(/0*$/, "").replace(/\.$/, "");
             switch (digit) {
                 case 0:
                     return normalized_num + "";
@@ -156,7 +156,7 @@
             digit = Math.floor(digit);
             /* normalize by dividing by the number of digits */
             let normalized_num = num / Math.pow(10, digit);
-            let error = 100;
+            let error = 10e12;
             let result = 0;
             for (let i = 0; i < list.length; i++) {
                 if(Math.abs(list[i] - normalized_num) < error) {
@@ -165,6 +165,28 @@
                 }
             }
             return result;
+        }
+
+        function calc_para_r(r1, target, list) {
+            let best_error = 100;
+            let best_rp = 0;
+            console.log(r1, target);
+            for (let d = -9; d <= 9; d++) {
+                for (let i = 0; i < list.length; i++) {
+                    let rp = list[i] * Math.pow(10, d);
+                    let para_r = 1 / ((1 / r1) + (1 / rp));
+                    let error = Math.abs(((para_r - target) / target));
+                    if(error < best_error) {
+                        best_error = error;
+                        best_rp = rp;
+                    }
+                }
+            }
+            return best_rp;
+        }
+
+        function calc_ser_r(r1, target, list) {
+            return round_list(target - r1, list);
         }
 
         function calc_r2form() {
@@ -184,7 +206,10 @@
             let R1_out = document.querySelector(output_query + "#R1");
             let R2_out = document.querySelector(output_query + "#R2");
             let Vout_out = document.querySelector(output_query + "#Vout");
+            let Voute_out = document.querySelector(output_query + "#Voute");
             let Ir1_out = document.querySelector(output_query + "#Ir1");
+            let Pr1_out = document.querySelector(output_query + "#Pr1");
+            let Pr2_out = document.querySelector(output_query + "#Pr2");
 
             let Vref = decode_value(Vref_in.value);
             let R1 = decode_value(R1_in.value);
@@ -253,29 +278,73 @@
             }
 
             R2 = R1 / ((Vout / Vref) - 1);
+
             if(list != null) {
                 R2 = round_list(R2, list);
             }
             Vout = Vref * (1 + (R1 / R2));
             Ir1 = Vout / (R1 + R2);
 
+            let Vout_in_value = decode_value(Vout_in.value);
+            let Voute = ((Vout - Vout_in_value) / Vout_in_value) * 100;
+
             Vref_out.value = encode_value(Vref);
             R1_out.value = encode_value(R1);
             R2_out.value = encode_value(R2);
             Vout_out.value = encode_value(Vout);
+            Voute_out.value = String(Voute.toPrecision(4)).replace(/0*$/, "").replace(/\.$/, "");
             Ir1_out.value = encode_value(Ir1);
 
+            let Pr1 = (Ir1 * (Vout - Vref));
+            Pr1_out.value = Pr1.toFixed(4);
+            let Pr2 = (Ir1 * Vref);
+            Pr2_out.value = Pr2.toFixed(4);
             /* Warning if resistor power consumption exceeds 1W */
-            if((Ir1 * Vout) > 1) {
-                Ir1_out.classList.add("error");
-                Ir1_out.classList.remove("warning");
+            if(Pr1 > 1) {
+                Pr1_out.classList.add("error");
+                Pr1_out.classList.remove("warning");
             } else {
-                Ir1_out.classList.remove("error");
-                /* Warning if resistor power consumption exceeds 0.25W */
-                if((Ir1 * Vout) > 0.25) {
-                    Ir1_out.classList.add("warning");
+                Pr1_out.classList.remove("error");
+                /* Warning if resistor power consumption exceeds 0.1W */
+                if(Pr1 > 0.1) {
+                    Pr1_out.classList.add("warning");
                 } else {
-                    Ir1_out.classList.remove("warning");
+                    Pr1_out.classList.remove("warning");
+                }
+            }
+            /* Warning if resistor power consumption exceeds 1W */
+            if(Pr2 > 1) {
+                Pr2_out.classList.add("error");
+                Pr2_out.classList.remove("warning");
+            } else {
+                Pr2_out.classList.remove("error");
+                /* Warning if resistor power consumption exceeds 0.1W */
+                if(Pr2 > 0.1) {
+                    Pr2_out.classList.add("warning");
+                } else {
+                    Pr2_out.classList.remove("warning");
+                }
+            }
+
+            if(list != null) {
+                if(
+                    R12_in.value.toLowerCase().indexOf("auto") >= 0 ||    
+                    R13_in.value.toLowerCase().indexOf("auto") >= 0
+                ) {
+                    R12_in.value = R12_in.value.replaceAll("auto", "");
+                    R13_in.value = R13_in.value.replaceAll("auto", "");
+                    let best_R1 = R2 * ((decode_value(Vout_in.value) / Vref) - 1);
+                    if(best_R1 < decode_value(R1_in.value)) {
+                        // parallel
+                        let out = calc_para_r(decode_value(R1_in.value), best_R1, list);
+                        R12_in.value = encode_value(out);
+                        update();
+                    } else {
+                        // series
+                        let out = calc_ser_r(decode_value(R1_in.value), best_R1, list);
+                        R13_in.value = encode_value(out);
+                        update();
+                    }
                 }
             }
         }
@@ -297,7 +366,10 @@
             let R1_out = document.querySelector(output_query + "#R1");
             let R2_out = document.querySelector(output_query + "#R2");
             let Vout_out = document.querySelector(output_query + "#Vout");
+            let Voute_out = document.querySelector(output_query + "#Voute");
             let Ir1_out = document.querySelector(output_query + "#Ir1");
+            let Pr1_out = document.querySelector(output_query + "#Pr1");
+            let Pr2_out = document.querySelector(output_query + "#Pr2");
 
             let Vref = decode_value(Vref_in.value);
             let R1 = decode_value(R1_in.value);
@@ -372,23 +444,66 @@
             Vout = Vref * (1 + (R1 / R2));
             Ir1 = Vout / (R1 + R2);
 
+            let Vout_in_value = decode_value(Vout_in.value);
+            let Voute = ((Vout - Vout_in_value) / Vout_in_value) * 100;
+
             Vref_out.value = encode_value(Vref);
             R1_out.value = encode_value(R1);
             R2_out.value = encode_value(R2);
             Vout_out.value = encode_value(Vout);
+            Voute_out.value = String(Voute.toPrecision(4)).replace(/0*$/, "").replace(/\.$/, "");
             Ir1_out.value = encode_value(Ir1);
 
+            let Pr1 = (Ir1 * (Vout - Vref));
+            Pr1_out.value = Pr1.toFixed(4);
+            let Pr2 = (Ir1 * Vref);
+            Pr2_out.value = Pr2.toFixed(4);
             /* Warning if resistor power consumption exceeds 1W */
-            if((Ir1 * Vout) > 1) {
-                Ir1_out.classList.add("error");
-                Ir1_out.classList.remove("warning");
+            if(Pr1 > 1) {
+                Pr1_out.classList.add("error");
+                Pr1_out.classList.remove("warning");
             } else {
-                Ir1_out.classList.remove("error");
-                /* Warning if resistor power consumption exceeds 0.25W */
-                if((Ir1 * Vout) > 0.25) {
-                    Ir1_out.classList.add("warning");
+                Pr1_out.classList.remove("error");
+                /* Warning if resistor power consumption exceeds 0.1W */
+                if(Pr1 > 0.1) {
+                    Pr1_out.classList.add("warning");
                 } else {
-                    Ir1_out.classList.remove("warning");
+                    Pr1_out.classList.remove("warning");
+                }
+            }
+            /* Warning if resistor power consumption exceeds 1W */
+            if(Pr2 > 1) {
+                Pr2_out.classList.add("error");
+                Pr2_out.classList.remove("warning");
+            } else {
+                Pr2_out.classList.remove("error");
+                /* Warning if resistor power consumption exceeds 0.1W */
+                if(Pr2 > 0.1) {
+                    Pr2_out.classList.add("warning");
+                } else {
+                    Pr2_out.classList.remove("warning");
+                }
+            }
+
+            if(list != null) {
+                if(
+                    R22_in.value.toLowerCase().indexOf("auto") >= 0 ||    
+                    R23_in.value.toLowerCase().indexOf("auto") >= 0
+                ) {
+                    R22_in.value = R22_in.value.replaceAll("auto", "");
+                    R23_in.value = R23_in.value.replaceAll("auto", "");
+                    let best_R2 = R1 / ((decode_value(Vout_in.value) / Vref) - 1);
+                    if(best_R2 < decode_value(R2_in.value)) {
+                        // parallel
+                        let out = calc_para_r(decode_value(R2_in.value), best_R2, list);
+                        R22_in.value = encode_value(out);
+                        update();
+                    } else {
+                        // series
+                        let out = calc_ser_r(decode_value(R2_in.value), best_R2, list);
+                        R23_in.value = encode_value(out);
+                        update();
+                    }
                 }
             }
         }
@@ -410,7 +525,10 @@
             let R1_out = document.querySelector(output_query + "#R1");
             let R2_out = document.querySelector(output_query + "#R2");
             let Vout_out = document.querySelector(output_query + "#Vout");
+            let Voute_out = document.querySelector(output_query + "#Voute");
             let Ir1_out = document.querySelector(output_query + "#Ir1");
+            let Pr1_out = document.querySelector(output_query + "#Pr1");
+            let Pr2_out = document.querySelector(output_query + "#Pr2");
 
             let Vref = decode_value(Vref_in.value);
             let R1 = decode_value(R1_in.value);
@@ -432,6 +550,29 @@
             }
             if(R23 > 0) {
                 R2 += R23;
+            }
+
+            let list = null;
+
+            switch(String(series_in.value)) {
+                case "E3":
+                    list = E3_list;
+                    break;
+                case "E6":
+                    list = E6_list;
+                    break;
+                case "E12":
+                    list = E12_list;
+                    break;
+                case "E24":
+                    list = E24_list;
+                    break;
+                case "E48":
+                    list = E48_list;
+                    break;
+                case "E96":
+                    list = E96_list;
+                    break;
             }
 
             if(Vref == null) {
@@ -458,23 +599,85 @@
             Vout = Vref * (1 + (R1 / R2));
             Ir1 = Vout / (R1 + R2);
 
+            let Vout_in_value = decode_value(Vout_in.value);
+            let Voute = ((Vout - Vout_in_value) / Vout_in_value) * 100;
+
             Vref_out.value = encode_value(Vref);
             R1_out.value = encode_value(R1);
             R2_out.value = encode_value(R2);
             Vout_out.value = encode_value(Vout);
+            Voute_out.value = String(Voute.toPrecision(4)).replace(/0*$/, "").replace(/\.$/, "");
             Ir1_out.value = encode_value(Ir1);
 
+            let Pr1 = (Ir1 * (Vout - Vref));
+            Pr1_out.value = Pr1.toFixed(4);
+            let Pr2 = (Ir1 * Vref);
+            Pr2_out.value = Pr2.toFixed(4);
             /* Warning if resistor power consumption exceeds 1W */
-            if((Ir1 * Vout) > 1) {
-                Ir1_out.classList.add("error");
-                Ir1_out.classList.remove("warning");
+            if(Pr1 > 1) {
+                Pr1_out.classList.add("error");
+                Pr1_out.classList.remove("warning");
             } else {
-                Ir1_out.classList.remove("error");
-                /* Warning if resistor power consumption exceeds 0.25W */
-                if((Ir1 * Vout) > 0.25) {
-                    Ir1_out.classList.add("warning");
+                Pr1_out.classList.remove("error");
+                /* Warning if resistor power consumption exceeds 0.1W */
+                if(Pr1 > 0.1) {
+                    Pr1_out.classList.add("warning");
                 } else {
-                    Ir1_out.classList.remove("warning");
+                    Pr1_out.classList.remove("warning");
+                }
+            }
+            /* Warning if resistor power consumption exceeds 1W */
+            if(Pr2 > 1) {
+                Pr2_out.classList.add("error");
+                Pr2_out.classList.remove("warning");
+            } else {
+                Pr2_out.classList.remove("error");
+                /* Warning if resistor power consumption exceeds 0.1W */
+                if(Pr2 > 0.1) {
+                    Pr2_out.classList.add("warning");
+                } else {
+                    Pr2_out.classList.remove("warning");
+                }
+            }
+            
+            if(list != null) {
+                if(
+                    R12_in.value.toLowerCase().indexOf("auto") >= 0 ||    
+                    R13_in.value.toLowerCase().indexOf("auto") >= 0
+                ) {
+                    R12_in.value = R12_in.value.replaceAll("auto", "");
+                    R13_in.value = R13_in.value.replaceAll("auto", "");
+                    let best_R1 = R2 * ((decode_value(Vout_in.value) / Vref) - 1);
+                    if(best_R1 < decode_value(R1_in.value)) {
+                        // parallel
+                        let out = calc_para_r(decode_value(R1_in.value), best_R1, list);
+                        R12_in.value = encode_value(out);
+                        update();
+                    } else {
+                        // series
+                        let out = calc_ser_r(decode_value(R1_in.value), best_R1, list);
+                        R13_in.value = encode_value(out);
+                        update();
+                    }
+                }
+                if(
+                    R22_in.value.toLowerCase().indexOf("auto") >= 0 ||    
+                    R23_in.value.toLowerCase().indexOf("auto") >= 0
+                ) {
+                    R22_in.value = R22_in.value.replaceAll("auto", "");
+                    R23_in.value = R23_in.value.replaceAll("auto", "");
+                    let best_R2 = R1 / ((decode_value(Vout_in.value) / Vref) - 1);
+                    if(best_R2 < decode_value(R2_in.value)) {
+                        // parallel
+                        let out = calc_para_r(decode_value(R2_in.value), best_R2, list);
+                        R22_in.value = encode_value(out);
+                        update();
+                    } else {
+                        // series
+                        let out = calc_ser_r(decode_value(R2_in.value), best_R2, list);
+                        R23_in.value = encode_value(out);
+                        update();
+                    }
                 }
             }
         }
@@ -562,8 +765,8 @@
 
             R1_out.value = encode_value(R1);
             R2_out.value = encode_value(R2);
-            R1e_out.value = String(R1e.toPrecision(2)).replace(/0*$/, "").replace(/\.$/, "");
-            R2e_out.value = String(R2e.toPrecision(2)).replace(/0*$/, "").replace(/\.$/, "");
+            R1e_out.value = String(R1e.toPrecision(4)).replace(/0*$/, "").replace(/\.$/, "");
+            R2e_out.value = String(R2e.toPrecision(4)).replace(/0*$/, "").replace(/\.$/, "");
         }
 
         function calc_vrefform() {
@@ -584,6 +787,8 @@
             let R2_out = document.querySelector(output_query + "#R2");
             let Vout_out = document.querySelector(output_query + "#Vout");
             let Ir1_out = document.querySelector(output_query + "#Ir1");
+            let Pr1_out = document.querySelector(output_query + "#Pr1");
+            let Pr2_out = document.querySelector(output_query + "#Pr2");
 
             let Vref = decode_value(Vref_in.value);
             let R1 = decode_value(R1_in.value);
@@ -637,17 +842,34 @@
             Vout_out.value = encode_value(Vout);
             Ir1_out.value = encode_value(Ir1);
 
+            let Pr1 = (Ir1 * (Vout - Vref));
+            Pr1_out.value = Pr1.toFixed(4);
+            let Pr2 = (Ir1 * Vref);
+            Pr2_out.value = Pr2.toFixed(4);
             /* Warning if resistor power consumption exceeds 1W */
-            if((Ir1 * Vout) > 1) {
-                Ir1_out.classList.add("error");
-                Ir1_out.classList.remove("warning");
+            if(Pr1 > 1) {
+                Pr1_out.classList.add("error");
+                Pr1_out.classList.remove("warning");
             } else {
-                Ir1_out.classList.remove("error");
-                /* Warning if resistor power consumption exceeds 0.25W */
-                if((Ir1 * Vout) > 0.25) {
-                    Ir1_out.classList.add("warning");
+                Pr1_out.classList.remove("error");
+                /* Warning if resistor power consumption exceeds 0.1W */
+                if(Pr1 > 0.1) {
+                    Pr1_out.classList.add("warning");
                 } else {
-                    Ir1_out.classList.remove("warning");
+                    Pr1_out.classList.remove("warning");
+                }
+            }
+            /* Warning if resistor power consumption exceeds 1W */
+            if(Pr2 > 1) {
+                Pr2_out.classList.add("error");
+                Pr2_out.classList.remove("warning");
+            } else {
+                Pr2_out.classList.remove("error");
+                /* Warning if resistor power consumption exceeds 0.1W */
+                if(Pr2 > 0.1) {
+                    Pr2_out.classList.add("warning");
+                } else {
+                    Pr2_out.classList.remove("warning");
                 }
             }
         }
@@ -674,13 +896,13 @@
         body {
             font-family: Verdana, Roboto, "Droid Sans", "游ゴシック", YuGothic, "メイリオ", Meiryo, arial, sans-serif;
             margin: 1rem auto;
-            max-width: 45rem;
+            max-width: 48rem;
             color: #222;
         }
 
-        @media screen and (max-width: 48rem) {
+        @media screen and (max-width: 52rem) {
             html {
-                font-size: 2.1vw;
+                font-size: 1.9vw;
             }
         }
 
@@ -760,11 +982,22 @@
             margin-bottom: 1rem;
         }
         label.label {
-            width: 4rem;
+            width: 5rem;
         }
         label.symbol {
             padding-left: 0.25rem;
             padding-right: 0.25rem;
+        }
+
+        .cell {
+            display: table-cell;
+        }
+        .cell.header {
+            font-size: 1rem;     
+            text-align: center;
+            margin-left: 0.2rem;
+            margin-right: 0.2rem;
+            padding-bottom: 0.5rem;
         }
         
         input, select {
@@ -843,6 +1076,14 @@
         <div class="block input">
             <h3>Inputs</h3>
             <div class="inputblock">
+                <span class="cell header"></span>
+                <span class="cell header"></span>
+                <span class="cell header"></span>
+                <span class="cell header">Parallel R</span>
+                <span class="cell header"></span>
+                <span class="cell header">Series R</span>
+            </div>
+            <div class="inputblock">
                 <label>V<sub>Ref</sub></label>:
                 <input type="text" name="Vref" id="Vref" inputmode="text" autocomplete required />
             </div>
@@ -850,17 +1091,17 @@
                 <label class="label">R1</label>:
                 <input type="text" name="R1" id="R1" inputmode="text" autocomplete required />
                 <label class="symbol">//</label>
-                <input type="text" class="optional" name="R12" id="R12" placeholder="Infinity" inputmode="text" autocomplete />
+                <input type="text" class="optional" name="R12" id="R12" placeholder="Inf./auto" inputmode="text" autocomplete />
                 <label class="symbol">+</label>
-                <input type="text" class="optional" name="R13" id="R13" placeholder="0" inputmode="text" autocomplete />
+                <input type="text" class="optional" name="R13" id="R13" placeholder="0/auto" inputmode="text" autocomplete />
             </div>
             <div class="inputblock disabled" aria-hidden="true">
                 <label class="label">R2</label>:
                 <input type="text" name="R2" id="R2" placeholder="" readonly />
                 <label class="symbol">//</label>
-                <input type="text" class="optional" name="R22" id="R22" placeholder="Infinity" placeholder="" readonly />
+                <input type="text" class="optional" name="R22" id="R22" placeholder="Inf./auto" placeholder="" readonly />
                 <label class="symbol">+</label>
-                <input type="text" class="optional" name="R23" id="R23" placeholder="0" placeholder="" readonly />
+                <input type="text" class="optional" name="R23" id="R23" placeholder="0/auto" placeholder="" readonly />
             </div>
             <div class="inputblock">
                 <label class="label">V<sub>OUT</sub></label>:
@@ -883,23 +1124,35 @@
             <h3>Outputs</h3>
             <div class="inputblock disabled" aria-hidden="true">
                 <label class="label">V<sub>Ref</sub></label>:
-                <input type="text" name="Vref" id="Vref" readonly />
+                <input type="text" name="Vref" id="Vref" readonly />V
             </div>
             <div class="inputblock disabled" aria-hidden="true">
                 <label class="label">R1</label>:
-                <input type="text" name="R1" id="R1" readonly />
+                <input type="text" name="R1" id="R1" readonly />Ω
             </div>
             <div class="inputblock">
                 <label class="label">R2</label>:
-                <input type="text" name="R2" id="R2" readonly />
+                <input type="text" name="R2" id="R2" readonly />Ω
             </div>
             <div class="inputblock">
                 <label class="label">V<sub>OUT</sub></label>:
-                <input type="text" name="Vout" id="Vout" readonly />
+                <input type="text" name="Vout" id="Vout" readonly />V
+            </div>
+            <div class="inputblock">
+                <label class="label">V<sub>OUT</sub> Err.</label>:
+                <input type="text" name="Voute" id="Voute" readonly />%
             </div>
             <div class="inputblock">
                 <label class="label">I<sub>R1</sub></label>:
-                <input type="text" name="Ir1" id="Ir1" readonly />
+                <input type="text" name="Ir1" id="Ir1" readonly />A
+            </div>
+            <div class="inputblock">
+                <label class="label">P<sub>R1</sub></label>:
+                <input type="text" name="Pr1" id="Pr1" readonly />W
+            </div>
+            <div class="inputblock">
+                <label class="label">P<sub>R2</sub></label>:
+                <input type="text" name="Pr2" id="Pr2" readonly />W
             </div>
         </div>
         <div class="inputblock center">
@@ -915,6 +1168,14 @@
         <div class="block input">
             <h3>Inputs</h3>
             <div class="inputblock">
+                <span class="cell header"></span>
+                <span class="cell header"></span>
+                <span class="cell header"></span>
+                <span class="cell header">Parallel R</span>
+                <span class="cell header"></span>
+                <span class="cell header">Series R</span>
+            </div>
+            <div class="inputblock">
                 <label class="label">V<sub>Ref</sub></label>:
                 <input type="text" name="Vref" id="Vref" inputmode="text" autocomplete required />
             </div>
@@ -922,17 +1183,17 @@
                 <label class="label">R1</label>:
                 <input type="text" name="R1" id="R1" inputmode="text" readonly/>
                 <label class="symbol">//</label>
-                <input type="text" class="optional" name="R12" id="R12" placeholder="Infinity" readonly />
+                <input type="text" class="optional" name="R12" id="R12" placeholder="Inf./auto" readonly />
                 <label class="symbol">+</label>
-                <input type="text" class="optional" name="R13" id="R13" placeholder="0" inputmode="text" readonly />
+                <input type="text" class="optional" name="R13" id="R13" placeholder="0/auto" inputmode="text" readonly />
             </div>
             <div class="inputblock">
                 <label class="label">R2</label>:
                 <input type="text" name="R2" id="R2" placeholder="" autocomplete required  />
                 <label class="symbol">//</label>
-                <input type="text" class="optional" name="R22" id="R22" placeholder="Infinity" autocomplete  />
+                <input type="text" class="optional" name="R22" id="R22" placeholder="Inf./auto" autocomplete  />
                 <label class="symbol">+</label>
-                <input type="text" class="optional" name="R23" id="R23" placeholder="0" autocomplete  />
+                <input type="text" class="optional" name="R23" id="R23" placeholder="0/auto" autocomplete  />
             </div>
             <div class="inputblock">
                 <label class="label">V<sub>OUT</sub></label>:
@@ -955,23 +1216,35 @@
             <h3>Outputs</h3>
             <div class="inputblock disabled" aria-hidden="true">
                 <label class="label">V<sub>Ref</sub></label>:
-                <input type="text" name="Vref" id="Vref" readonly />
+                <input type="text" name="Vref" id="Vref" readonly />V
             </div>
             <div class="inputblock">
                 <label class="label">R1</label>:
-                <input type="text" name="R1" id="R1" readonly />
+                <input type="text" name="R1" id="R1" readonly />Ω
             </div>
             <div class="inputblock disabled" aria-hidden="true">
                 <label class="label">R2</label>:
-                <input type="text" name="R2" id="R2" readonly />
+                <input type="text" name="R2" id="R2" readonly />Ω
             </div>
             <div class="inputblock">
                 <label class="label">V<sub>OUT</sub></label>:
-                <input type="text" name="Vout" id="Vout" readonly />
+                <input type="text" name="Vout" id="Vout" readonly />V
+            </div>
+            <div class="inputblock">
+                <label class="label">V<sub>OUT</sub> Err.</label>:
+                <input type="text" name="Voute" id="Voute" readonly />%
             </div>
             <div class="inputblock">
                 <label class="label">I<sub>R1</sub></label>:
-                <input type="text" name="Ir1" id="Ir1" readonly />
+                <input type="text" name="Ir1" id="Ir1" readonly />A
+            </div>
+            <div class="inputblock">
+                <label class="label">P<sub>R1</sub></label>:
+                <input type="text" name="Pr1" id="Pr1" readonly />W
+            </div>
+            <div class="inputblock">
+                <label class="label">P<sub>R2</sub></label>:
+                <input type="text" name="Pr2" id="Pr2" readonly />W
             </div>
         </div>
         <div class="inputblock center">
@@ -986,6 +1259,14 @@
         
         <div class="block input">
             <h3>Inputs</h3>
+            <div class="inputblock">
+                <span class="cell header"></span>
+                <span class="cell header"></span>
+                <span class="cell header"></span>
+                <span class="cell header">Parallel R</span>
+                <span class="cell header"></span>
+                <span class="cell header">Series R</span>
+            </div>
             <div class="inputblock">
                 <label class="label">R1</label>:
                 <input type="text" name="R1" id="R1" inputmode="text" autocomplete required />
@@ -1020,7 +1301,7 @@
             <h3>Outputs</h3>
             <div class="inputblock">
                 <label class="label">R1</label>:
-                <input type="text" name="R1" id="R1" readonly />
+                <input type="text" name="R1" id="R1" readonly />Ω
             </div>
             <div class="inputblock">
                 <label>R1 Err</label>:
@@ -1028,7 +1309,7 @@
             </div>
             <div class="inputblock">
                 <label class="label">R2</label>:
-                <input type="text" name="R2" id="R2" readonly />
+                <input type="text" name="R2" id="R2" readonly />Ω
             </div>
             <div class="inputblock">
                 <label>R2 Err</label>:
@@ -1045,6 +1326,14 @@
         <div class="block input">
             <h3>Inputs</h3>
             <div class="inputblock">
+                <span class="cell header"></span>
+                <span class="cell header"></span>
+                <span class="cell header"></span>
+                <span class="cell header">Parallel R</span>
+                <span class="cell header"></span>
+                <span class="cell header">Series R</span>
+            </div>
+            <div class="inputblock">
                 <label class="label">V<sub>Ref</sub></label>:
                 <input type="text" name="Vref" id="Vref" inputmode="text" autocomplete required />
             </div>
@@ -1052,44 +1341,68 @@
                 <label class="label">R1</label>:
                 <input type="text" name="R1" id="R1" inputmode="text" autocomplete required />
                 <label class="symbol">//</label>
-                <input type="text" class="optional" name="R12" id="R12" placeholder="Infinity" inputmode="text" autocomplete />
+                <input type="text" class="optional" name="R12" id="R12" placeholder="Inf./auto" inputmode="text" autocomplete />
                 <label class="symbol">+</label>
-                <input type="text" class="optional" name="R13" id="R13" placeholder="0" inputmode="text" autocomplete />
+                <input type="text" class="optional" name="R13" id="R13" placeholder="0/auto" inputmode="text" autocomplete />
             </div>
             <div class="inputblock">
                 <label class="label">R2</label>:
                 <input type="text" name="R2" id="R2" placeholder="" autocomplete required  />
                 <label class="symbol">//</label>
-                <input type="text" class="optional" name="R22" id="R22" placeholder="Infinity" placeholder="" autocomplete  />
+                <input type="text" class="optional" name="R22" id="R22" placeholder="Inf./auto" placeholder="" autocomplete  />
                 <label class="symbol">+</label>
-                <input type="text" class="optional" name="R23" id="R23" placeholder="0" autocomplete  />
+                <input type="text" class="optional" name="R23" id="R23" placeholder="0/auto" autocomplete  />
             </div>
-            <div class="inputblock disabled" aria-hidden="true">
+            <div class="inputblock">
                 <label class="label">V<sub>OUT</sub></label>:
-                <input type="text" name="Vout" id="Vout" inputmode="text" readonly />
+                <input type="text" name="Vout" id="Vout" inputmode="text" placeholder="0" autocomplete />
+            </div>
+            <div class="inputblock">
+                <label class="label">E series</label>:
+                <select name="series" id="series" inputmode>
+                    <option value="E3">E3</option>
+                    <option value="E6">E6</option>
+                    <option value="E12">E12</option>
+                    <option value="E24">E24</option>
+                    <option value="E48">E48</option>
+                    <option value="E96">E96</option>
+                    <option value="None" selected>None</option>
+                </select>
             </div>
         </div>
         <div class="block output">
             <h3>Outputs</h3>
             <div class="inputblock disabled" aria-hidden="true">
                 <label class="label">V<sub>Ref</sub></label>:
-                <input type="text" name="Vref" id="Vref" readonly />
+                <input type="text" name="Vref" id="Vref" readonly />V
             </div>
             <div class="inputblock disabled" aria-hidden="true">
                 <label class="label">R1</label>:
-                <input type="text" name="R1" id="R1" readonly />
+                <input type="text" name="R1" id="R1" readonly />Ω
             </div>
             <div class="inputblock disabled" aria-hidden="true">
                 <label class="label">R2</label>:
-                <input type="text" name="R2" id="R2" readonly />
+                <input type="text" name="R2" id="R2" readonly />Ω
             </div>
             <div class="inputblock">
                 <label class="label">V<sub>OUT</sub></label>:
-                <input type="text" name="Vout" id="Vout" readonly />
+                <input type="text" name="Vout" id="Vout" readonly />V
+            </div>
+            <div class="inputblock">
+                <label class="label">V<sub>OUT</sub> Err.</label>:
+                <input type="text" name="Voute" id="Voute" readonly />%
             </div>
             <div class="inputblock">
                 <label class="label">I<sub>R1</sub></label>:
-                <input type="text" name="Ir1" id="Ir1" readonly />
+                <input type="text" name="Ir1" id="Ir1" readonly />A
+            </div>
+            <div class="inputblock">
+                <label class="label">P<sub>R1</sub></label>:
+                <input type="text" name="Pr1" id="Pr1" readonly />W
+            </div>
+            <div class="inputblock">
+                <label class="label">P<sub>R2</sub></label>:
+                <input type="text" name="Pr2" id="Pr2" readonly />W
             </div>
         </div>
         <div class="inputblock center">
@@ -1104,6 +1417,14 @@
         
         <div class="block input">
             <h3>Inputs</h3>
+            <div class="inputblock">
+                <span class="cell header"></span>
+                <span class="cell header"></span>
+                <span class="cell header"></span>
+                <span class="cell header">Parallel R</span>
+                <span class="cell header"></span>
+                <span class="cell header">Series R</span>
+            </div>
             <div class="inputblock disabled" aria-hidden="true">
                 <label class="label">V<sub>Ref</sub></label>:
                 <input type="text" name="Vref" id="Vref" inputmode="text" readonly />
@@ -1133,23 +1454,31 @@
             <h3>Outputs</h3>
             <div class="inputblock">
                 <label class="label">V<sub>Ref</sub></label>:
-                <input type="text" name="Vref" id="Vref" readonly />
+                <input type="text" name="Vref" id="Vref" readonly />V
             </div>
             <div class="inputblock disabled" aria-hidden="true">
                 <label class="label">R1</label>:
-                <input type="text" name="R1" id="R1" readonly />
+                <input type="text" name="R1" id="R1" readonly />Ω
             </div>
             <div class="inputblock disabled" aria-hidden="true">
                 <label class="label">R2</label>:
-                <input type="text" name="R2" id="R2" readonly />
+                <input type="text" name="R2" id="R2" readonly />Ω
             </div>
             <div class="inputblock disabled" aria-hidden="true">
                 <label class="label">V<sub>OUT</sub></label>:
-                <input type="text" name="Vout" id="Vout" readonly />
+                <input type="text" name="Vout" id="Vout" readonly />V
             </div>
             <div class="inputblock">
                 <label class="label">I<sub>R1</sub></label>:
-                <input type="text" name="Ir1" id="Ir1" readonly />
+                <input type="text" name="Ir1" id="Ir1" readonly />A
+            </div>
+            <div class="inputblock">
+                <label class="label">P<sub>R1</sub></label>:
+                <input type="text" name="Pr1" id="Pr1" readonly />W
+            </div>
+            <div class="inputblock">
+                <label class="label">P<sub>R2</sub></label>:
+                <input type="text" name="Pr2" id="Pr2" readonly />W
             </div>
         </div>
         <div class="inputblock center">
@@ -1195,6 +1524,7 @@
         20240417 minor modification of HTML<br>
         20240509 add Series Resistor input and License text in HTML<br>
         20240619 minor visual changes<br>
+        20240626 resistor power calc and type "auto" to para/ser resistance calc<br>
     </div>
     <center>created by <a href="https://kohacraft.com/archives/author/kohanii">kohanii</a></center>
   </body>
