@@ -687,6 +687,8 @@
             const output_query = ".Eroundform .output "
             let R1_in = document.querySelector(input_query + "#R1");
             let R2_in = document.querySelector(input_query + "#R2");
+            let ideal_R1_in = document.querySelector(input_query + "#idealR1");
+            let ideal_R2_in = document.querySelector(input_query + "#idealR2");
             let R12_in = document.querySelector(input_query + "#R12");
             let R22_in = document.querySelector(input_query + "#R22");
             let R13_in = document.querySelector(input_query + "#R13");
@@ -701,6 +703,8 @@
 
             let R1 = decode_value(R1_in.value);
             let R2 = decode_value(R2_in.value);
+            let ideal_R1 = decode_value(ideal_R1_in.value);
+            let ideal_R2 = decode_value(ideal_R2_in.value);
             let R12 = decode_value(R12_in.value);
             let R22 = decode_value(R22_in.value);
             let R13 = decode_value(R13_in.value);
@@ -758,8 +762,8 @@
                 R1r = round_list(R1, list);
                 R2r = round_list(R2, list);
             }
-            let R1e = ((R1r - R1) / R1) * 100;
-            let R2e = ((R2r - R2) / R2) * 100;
+            let R1e = ((R1r - ideal_R1) / ideal_R1) * 100;
+            let R2e = ((R2r - ideal_R2) / ideal_R2) * 100;
             R1 = R1r;
             R2 = R2r;
 
@@ -1284,12 +1288,20 @@
                 <input type="text" class="optional" name="R13" id="R13" placeholder="0" inputmode="text" autocomplete />
             </div>
             <div class="inputblock">
+                <label class="label">Ideal R1</label>:
+                <input type="text" name="idealR1" id="idealR1" inputmode="text" autocomplete required />
+            </div>
+            <div class="inputblock">
                 <label class="label">R2</label>:
                 <input type="text" name="R2" id="R2" placeholder="" autocomplete required  />
                 <label class="symbol">//</label>
                 <input type="text" class="optional" name="R22" id="R22" placeholder="Infinity" autocomplete />
                 <label class="symbol">+</label>
                 <input type="text" class="optional" name="R23" id="R23" placeholder="0" autocomplete />
+            </div>
+            <div class="inputblock">
+                <label class="label">Ideal R2</label>:
+                <input type="text" name="idealR2" id="idealR2" inputmode="text" autocomplete required />
             </div>
             <div class="inputblock">
                 <label class="label">E series</label>:
@@ -1546,6 +1558,7 @@
         20240619 minor visual changes<br>
         20240626 resistor power calc and type "auto" to para/ser resistance calc<br>
         20240908 align the rows of the Inputs and Outputs columns<br>
+        20251005 add Ideal R Input in Round to E series<br>
     </div>
     <center>created by <a href="https://kohacraft.com/archives/author/kohanii">kohanii</a></center>
   </body>
